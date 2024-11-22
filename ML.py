@@ -100,3 +100,17 @@ for url in url_list:
 
 driver.quit()
 print("드라이버 종료")
+
+# 저장할 폴더 경로
+output_folder = "cleaned_texts"  # 원하는 폴더 이름 지정
+
+# 폴더가 없으면 생성
+os.makedirs(output_folder, exist_ok=True)
+
+# 각 텍스트를 개별 파일로 저장
+for idx, txt in enumerate(txt_list, start=1):
+    output_file = os.path.join(output_folder, f"cleaned_text_{idx}.txt")  # 폴더 경로 포함
+    with open(output_file, 'w', encoding='utf-8') as file:
+        file.write(txt)  # 전처리된 텍스트를 파일에 저장
+
+    print(f"텍스트가 '{output_file}'에 저장되었습니다.")
