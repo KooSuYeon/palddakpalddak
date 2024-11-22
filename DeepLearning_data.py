@@ -42,7 +42,7 @@ txt_list=[]
 
 # 환경변수에 저장된 URL 로드
 for i in range(1, 17):  # URL_1 ~ URL_16
-    url = os.getenv(f"URL_{i}")
+    url = os.getenv(f"DL_URL_{i}")
     if url:  # 환경변수가 존재하면 추가
         url_list.append(url)
 
