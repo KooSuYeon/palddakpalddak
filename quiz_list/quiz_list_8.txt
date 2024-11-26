@@ -1,0 +1,11 @@
+**퀴즈**: 'PyTorch를 사용하여 간단한 인공 신경망 모델을 구현할 때, 역전파를 통해 기울기를 계산하는 메서드는 무엇인가요?**
+
+A) optimizer.zero_grad()
+
+B) loss.backward()
+
+C) optimizer.step()
+
+D) nn.Module
+
+정답: B) loss.backward()

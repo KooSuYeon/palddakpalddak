@@ -1,0 +1,10 @@
+**Quiz:**
+
+가상환경을 생성하기 위한 Conda 명령어는 무엇인가요?
+
+a) conda start --name myenv python=3.8  
+b) conda build --name myenv python=3.8  
+c) conda create --name myenv python=3.8  
+d) conda init --name myenv python=3.8  
+
+**정답:** c) conda create --name myenv python=3.8

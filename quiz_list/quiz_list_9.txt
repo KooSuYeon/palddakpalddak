@@ -1,0 +1,8 @@
+Question: 아래 설명에 해당하는 풀링 층의 종류는 무엇인가요? "필터 크기 내에서 최대 값을 선택하여 중요한 특징을 강조하고, 불필요한 정보를 제거합니다."
+
+A) Average Pooling  
+B) Max Pooling  
+C) Flatten Layer  
+D) Batch Normalization  
+
+정답: B) Max Pooling

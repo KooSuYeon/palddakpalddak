@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 dataset_spartanotion.py
 RAG
@@ -10,4 +11,6 @@ requirements.txt
 # pip uninstall -r requirements.txt -y  # 모두 제거하기
 # pip uninstall 패키지 # 패키지 하나씩 지우기
 AI_boot
+=======
+>>>>>>> 63e4a3e (add/seperate-docs-1: 학습용 챗봇 고도화)
 .env
