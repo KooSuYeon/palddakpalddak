@@ -168,7 +168,7 @@ def create_quiz(topic):
     quiz_response = rag_chain_debug["llm"].invoke(quiz_prompt_messages)
     return quiz_response.content
 
-def check_answer(context, answer):
+def create_answer(context, answer):
     answer_prompt_messages = rag_chain_debug["answer_prompt"].invoke({
         "context": context,
         "answer": answer

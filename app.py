@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from model import create_quiz, check_answer # rag_model.py 파일을 임포트
+from model import create_quiz, create_answer # rag_model.py 파일을 임포트
 import uvicorn
 
 app = FastAPI()
@@ -27,7 +27,7 @@ async def generate_quiz(request: QuizRequest):
 @app.post("/check_answer")
 async def check_answer(request: AnswerRequest):
     try:
-        result = check_answer(request.context, request.answer)
+        result = create_answer(request.context, request.answer)
         return {"result": result}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
