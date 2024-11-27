@@ -1,0 +1,11 @@
+Quiz: 퀴즈: 머신러닝의 주요 목표는 무엇인가요? 다음 중 올바른 설명을 선택하세요.
+
+1. 머신러닝은 데이터에서 패턴을 인식하여 새로운 데이터에 대한 예측을 수행하는 기술이다.
+2. 머신러닝은 주로 수학 공식을 이용하여 문제를 해결하는 것이다.
+3. 머신러닝은 인간처럼 생각하고 행동하는 AI를 만드는 것이다.
+4. 머신러닝은 데이터를 수집하는 과정이다.
+
+정답을 선택해 주세요! (1, 2, 3, 4 중 하나를 입력해 주세요.)
+User Answer: 
+Feedback: content='정답: 1. 머신러닝은 데이터에서 패턴을 인식하여 새로운 데이터에 대한 예측을 수행하는 기술이다.\n\n피드백: 선택하신 1번은 머신러닝의 주요 목표를 잘 설명하고 있습니다. 머신러닝은 데이터를 통해 학습하고, 이를 기반으로 새로운 데이터에 대해 예측이나 결정을 내리는 기술입니다. \n\n2번은 머신러닝이 수학 공식을 사용하는 부분을 언급하지만, 그것이 머신러닝의 주요 목표라고 보기는 어렵습니다. 3번은 머신러닝의 한 분야인 인공지능을 좀 더 넓은 관점에서 설명하고 있어, 머신러닝의 특정 목표와는 직접적으로 관련이 없습니다. 4번은 데이터 수집 과정에 대한 설명으로 머신러닝의 목표와는 거리가 있습니다.\n\n따라서, 1번이 올바른 설명입니다! 잘 하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 196, 'prompt_tokens': 188, 'total_tokens': 384, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-4ed0b661-8799-4ee4-9ba8-117073ea057d-0' usage_metadata={'input_tokens': 188, 'output_tokens': 196, 'total_tokens': 384, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------

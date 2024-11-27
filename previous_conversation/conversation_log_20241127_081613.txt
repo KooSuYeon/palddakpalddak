@@ -1,0 +1,22 @@
+Quiz: 퀴즈: 다음 중 머신러닝의 구성 요소에 해당하지 않는 것은 무엇인가요?
+
+1. 데이터셋
+2. 특징(Feature)
+3. 레이블(label)
+4. 알고리즘(Algorithm)
+
+사용자의 대답을 기다리겠습니다!
+User Answer: 4
+Feedback: content='사용자의 답변을 기다리겠습니다! 퀴즈의 정답 여부를 확인하고 피드백을 제공할 준비가 되어 있습니다.' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 31, 'prompt_tokens': 107, 'total_tokens': 138, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-eb4c7fb7-e055-407e-9b01-5f3eb5d5bb54-0' usage_metadata={'input_tokens': 107, 'output_tokens': 31, 'total_tokens': 138, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: 머신러닝에서는 컴퓨터가 명시적으로 프로그래밍 되지 않고 데이터를 통해 학습하고 예측할 수 있도록 하는 기능을 무엇이라고 하나요? 
+
+1. 인공지능 (AI)
+2. 머신러닝 (ML)
+3. 딥러닝 (DL)
+4. 데이터 마이닝
+
+정답을 선택해 주세요! (1, 2, 3, 4)
+User Answer: 2
+Feedback: content='정답은 2. 머신러닝 (ML)입니다.\n\n피드백: 머신러닝은 컴퓨터가 명시적으로 프로그래밍 되지 않고 데이터를 통해 학습하고 예측할 수 있도록 하는 기술입니다. 인공지능(AI)은 더 넓은 개념으로, 머신러닝과 딥러닝(DL)은 AI의 하위 분야입니다. 데이터 마이닝은 데이터에서 유용한 정보를 추출하는 과정으로, 머신러닝과는 다른 개념입니다. 잘 선택하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 113, 'prompt_tokens': 141, 'total_tokens': 254, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-83ac85a6-4cee-4b23-aab7-783ba0b01529-0' usage_metadata={'input_tokens': 141, 'output_tokens': 113, 'total_tokens': 254, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------

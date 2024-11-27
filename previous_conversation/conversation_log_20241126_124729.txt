@@ -1,0 +1,33 @@
+Quiz: 퀴즈: 회귀 모델에 대한 다음 설명 중 올바른 것은 무엇인가요?
+
+1. 회귀 모델은 주로 이산적인 값을 예측하는 데 사용된다.
+2. 회귀 모델은 연속적인 값을 예측하는 데 사용된다.
+3. 회귀 모델은 분류 문제를 해결하는 데 사용된다.
+4. 회귀 모델은 데이터의 군집을 찾는 데 사용된다.
+
+정답을 선택해 주세요 (1, 2, 3, 4 중 하나).
+User Answer: 2
+Feedback: content='정답: 2\n\n피드백: 선택하신 2번 "회귀 모델은 연속적인 값을 예측하는 데 사용된다."는 올바른 설명입니다. 회귀 분석은 주로 연속적인 목표 변수를 예측하는 데 사용되며, 예를 들어 주택 가격, 기온, 판매량 등의 예측에 활용됩니다. \n\n1번은 잘못된 설명으로, 회귀 모델은 이산적인 값(예: 분류 문제)에 대한 예측에는 적합하지 않습니다. \n3번과 4번도 잘못된 설명입니다. 3번은 회귀 모델이 아닌 분류 모델의 영역이며, 4번은 군집화(clustering) 문제에 해당합니다.\n\n따라서 회귀 모델에 대한 설명으로는 2번이 정확합니다. 잘 하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 180, 'prompt_tokens': 173, 'total_tokens': 353, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-45c82104-0870-448e-9213-08227a81f044-0' usage_metadata={'input_tokens': 173, 'output_tokens': 180, 'total_tokens': 353, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: SVM(Support Vector Machine) 알고리즘의 주된 목적은 무엇인가요?
+
+1. 데이터의 클러스터링
+2. 데이터의 분류
+3. 데이터의 회귀 분석
+4. 데이터의 차원 축소
+
+정답을 선택해주세요. (1, 2, 3, 4 중 하나)
+User Answer: 2
+Feedback: content='정답: 2\n\n피드백: 선택하신 2번 "데이터의 분류"는 SVM(Support Vector Machine) 알고리즘의 주된 목적에 대한 올바른 답변입니다. SVM은 주로 두 개 이상의 클래스로 데이터를 분류하는 데 사용되는 강력한 머신러닝 알고리즘입니다. \n\n1번 "데이터의 클러스터링"은 군집화 알고리즘에 해당하며, SVM의 주된 목적과는 다릅니다. \n3번 "데이터의 회귀 분석"은 SVM을 회귀 문제에 적용할 수 있지만, SVM의 기본적인 목적은 분류입니다. \n4번 "데이터의 차원 축소"는 주로 PCA(주성분 분석)와 같은 다른 기법에 해당합니다.\n\n따라서 SVM의 주된 목적은 2번, 즉 데이터의 분류입니다. 잘 하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 202, 'prompt_tokens': 674, 'total_tokens': 876, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_3de1288069', 'finish_reason': 'stop', 'logprobs': None} id='run-011a3e65-4ba5-48a2-b090-537f6a7a222a-0' usage_metadata={'input_tokens': 674, 'output_tokens': 202, 'total_tokens': 876, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: 머신러닝에서 '학습'이란 무엇을 의미할까요? 다음 중 올바른 설명을 선택하세요.
+
+1. 머신러닝 모델이 주어진 데이터를 통해 패턴을 인식하고, 이를 기반으로 예측을 수행하기 위해 가중치를 조정하는 과정이다.
+2. 머신러닝 모델이 무작위로 데이터를 생성하는 과정이다.
+3. 머신러닝 모델이 단순히 데이터를 저장하는 과정이다.
+4. 머신러닝 모델이 모든 데이터를 한 번에 처리하는 과정이다.
+
+정답을 선택해 주세요! (1, 2, 3, 4 중 번호로 대답해 주세요.)
+User Answer: 1
+Feedback: content='정답: 2\n\n피드백: 선택하신 2번 "데이터의 분류"는 SVM(Support Vector Machine) 알고리즘의 주된 목적에 대한 올바른 답변입니다. SVM은 주로 두 개 이상의 클래스로 데이터를 분류하는 데 사용되는 강력한 머신러닝 알고리즘입니다.\n\n1번 "데이터의 클러스터링"은 군집화 알고리즘에 해당하며, SVM의 주된 목적과는 다릅니다. 3번 "데이터의 회귀 분석"은 SVM을 회귀 문제에 적용할 수 있지만, SVM의 기본적인 목적은 분류입니다. 4번 "데이터의 차원 축소"는 주로 PCA(주성분 분석)와 같은 다른 기법에 해당합니다.\n\n따라서 SVM의 주된 목적은 2번, 즉 데이터의 분류입니다. 잘 하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 201, 'prompt_tokens': 1268, 'total_tokens': 1469, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-22b7c23a-e236-41da-be2f-a7048f851e1a-0' usage_metadata={'input_tokens': 1268, 'output_tokens': 201, 'total_tokens': 1469, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------

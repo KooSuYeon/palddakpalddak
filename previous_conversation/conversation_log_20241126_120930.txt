@@ -1,0 +1,11 @@
+Quiz: 퀴즈: 머신러닝의 학습 과정에서 모델이 데이터를 통해 패턴을 인식하고 예측을 수행하기 위해 가중치를 조정하는 과정을 무엇이라고 하나요?
+
+1. 데이터 전처리
+2. 모델 훈련
+3. 테스트
+4. 예측
+
+정답을 선택해 주세요! (1, 2, 3, 4 중 하나를 입력하세요.)
+User Answer: 2
+Feedback: content='정답입니다! 사용자가 선택한 "모델 훈련"은 머신러닝의 학습 과정에서 모델이 데이터를 통해 패턴을 인식하고 예측을 수행하기 위해 가중치를 조정하는 과정을 정확히 설명합니다. \n\n모델 훈련은 주어진 데이터를 기반으로 모델이 최적의 예측을 할 수 있도록 조정하는 중요한 단계입니다. 잘하셨습니다! 추가 질문이 있으면 언제든지 물어보세요!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 101, 'prompt_tokens': 152, 'total_tokens': 253, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-8e314d2c-67a7-4a4c-bb50-22822e7a5c53-0' usage_metadata={'input_tokens': 152, 'output_tokens': 101, 'total_tokens': 253, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------

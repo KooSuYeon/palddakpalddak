@@ -1,0 +1,22 @@
+Quiz: 퀴즈: 나이브베이즈 분류모델에 대한 설명 중 옳은 것을 고르세요.
+
+1. 나이브베이즈 모델은 모든 입력 변수가 서로 독립적이라고 가정한다.
+2. 나이브베이즈 모델은 연속형 데이터만 처리할 수 있다.
+3. 나이브베이즈 모델은 비지도학습에 속한다.
+4. 나이브베이즈 모델은 주로 회귀 문제에 사용된다.
+
+정답을 1, 2, 3, 4 중 하나로 선택해 주세요!
+User Answer: 1
+Feedback: content='- 정답 여부: "1"\n- 추가 설명: 나이브베이즈 모델은 베이즈 정리를 기반으로 하며, 모든 입력 변수가 서로 독립적이라는 가정을 합니다. 이 가정은 "나이브(naive)"라는 이름의 유래이기도 합니다. 나이브베이즈는 주로 분류 문제에 사용되며, 이론적으로는 연속형 데이터와 범주형 데이터 모두 처리할 수 있지만, 일반적으로는 범주형 데이터에 더 적합합니다. 비지도학습이 아닌 지도학습에 속하며, 회귀 문제에는 보통 사용되지 않습니다.' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 136, 'prompt_tokens': 266, 'total_tokens': 402, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-884fabee-d1af-48ac-a9c9-0c7ac373cfcf-0' usage_metadata={'input_tokens': 266, 'output_tokens': 136, 'total_tokens': 402, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: 나이브베이즈 분류모델에 대한 설명입니다. 나이브베이즈는 어떤 가정을 기반으로 하는 분류 알고리즘인가요?
+
+A) 모든 피처가 서로 독립적이다.  
+B) 피처 간의 상관관계가 존재한다.  
+C) 모든 피처가 동일한 중요도를 가진다.  
+D) 피처의 분포가 정규분포를 따른다.  
+
+정답을 선택해 주세요. (A, B, C, D 중 하나)
+User Answer: 1
+Feedback: content='- 정답 여부: "A"\n- 추가 설명: 나이브베이즈 분류모델은 "모든 피처가 서로 독립적이다"라는 가정을 기반으로 합니다. 이 가정은 실제 데이터에서는 항상 성립하지 않을 수 있지만, 나이브베이즈는 이 가정을 통해 계산을 단순화하고 효율적인 분류를 가능하게 합니다. 피처 간의 독립성을 가정함으로써, 나이브베이즈는 각 피처의 조건부 확률을 곱하여 전체 확률을 계산하는 방식으로 작동합니다.' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 128, 'prompt_tokens': 297, 'total_tokens': 425, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-ac9cc90e-e045-4faf-98f5-572a790c8a6b-0' usage_metadata={'input_tokens': 297, 'output_tokens': 128, 'total_tokens': 425, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------

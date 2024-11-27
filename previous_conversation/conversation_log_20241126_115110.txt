@@ -1,0 +1,11 @@
+Quiz: 퀴즈: 머신러닝의 정의에 대한 질문입니다. 다음 중 머신러닝(ML)의 정의로 올바른 것은 무엇인가요?
+
+1. 머신러닝은 데이터를 통해 스스로 배우고 똑똑해지는 기술이다.
+2. 머신러닝은 인간의 감정을 이해하는 기술이다.
+3. 머신러닝은 모든 데이터를 무작위로 처리하는 기술이다.
+4. 머신러닝은 단순한 데이터 저장 기술이다.
+
+정답을 선택해 주세요 (1, 2, 3, 4 중 하나).
+User Answer: 2
+Feedback: content="사용자의 답변: 2\n\n피드백:\n선택하신 답변은 '2. 머신러닝은 인간의 감정을 이해하는 기술이다.'입니다. 그러나 이 정의는 머신러닝의 본질을 제대로 설명하지 않습니다. 머신러닝은 데이터를 통해 스스로 학습하고 예측, 분류 등을 수행하는 기술입니다. \n\n정답은 '1. 머신러닝은 데이터를 통해 스스로 배우고 똑똑해지는 기술이다.'입니다. 머신러닝은 특정 작업을 수행하기 위해 데이터에서 패턴을 학습하여 모델을 개선하는 방법론입니다. \n\n다음에는 머신러닝의 기본 개념을 더욱 깊이 이해해 보시길 바랍니다!" additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 151, 'prompt_tokens': 181, 'total_tokens': 332, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-cefd6db9-6b66-4d1b-ab46-ba02911ad6e4-0' usage_metadata={'input_tokens': 181, 'output_tokens': 151, 'total_tokens': 332, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
