@@ -111,16 +111,28 @@ def Crolling(driver, url_list):
         txt = re.sub(r'\\[a-zA-Z]+', '', txt)        # \command 형식 제거
 
         # 3. 불필요한 문구 제거
-        txt = re.sub(r'모든 토글을 열고 닫는 단축키', '', txt)
-        txt = re.sub(r'Windows\s*:\s*Ctrl\s*\+\s*alt\s*\+\s*t', '', txt)
-        txt = re.sub(r'Mac\s*:\s*⌘\s*\+\s*⌥\s*\+\s*t', '', txt)
-        txt = re.sub(r'Copyright ⓒ TeamSparta All rights reserved', '', txt)
+        # txt = re.sub(r'모든 토글을 열고 닫는 단축키', '', txt)
+        # txt = re.sub(r'Windows\s*:\s*Ctrl\s*\+\s*alt\s*\+\s*t', '', txt)
+        # txt = re.sub(r'Mac\s*:\s*⌘\s*\+\s*⌥\s*\+\s*t', '', txt)
+        # txt = re.sub(r'Copyright ⓒ TeamSparta All rights reserved', '', txt)
         # txt = re.sub(r'\s+', ' ', txt).strip()
 
         # 텍스트만 가져오기
         txt_list.append(txt)
 
     driver.quit()  # 브라우저 종료
+
+    for i in range(len(txt_list)):
+        txt_list[i] = txt_list[i].replace('모든 토글을 열고 닫는 단축키', '')
+        txt_list[i] = txt_list[i].replace('Windows : Ctrl + alt + t', '')
+        txt_list[i] = txt_list[i].replace('Mac : ⌘ + ⌥ + t', '')
+        txt_list[i] = txt_list[i].replace('Copyright ⓒ TeamSparta All rights reserved', '')
+
+    # for txt in txt_list:
+    #     txt = txt.replace('모든 토글을 열고 닫는 단축키', '')
+    #     txt = txt.replace('Windows : Ctrl + alt + t', '')
+    #     txt = txt.replace('Mac : ⌘ + ⌥ + t', '')
+    #     txt = txt.replace('Copyright ⓒ TeamSparta All rights reserved', '')
 
     return txt_list
 
