@@ -1,6 +1,7 @@
 
 dataset_spartanotion.py
 RAG
+api.http
 # 가상환경 활성화 코드
 # RAG\Scripts\activate
 
