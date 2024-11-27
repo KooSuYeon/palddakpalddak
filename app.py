@@ -25,7 +25,7 @@ async def generate_quiz(request: QuizRequest):
 
 # 답변 검토 엔드포인트
 @app.post("/check_answer")
-async def check_answer(request):
+async def check_answer(request: AnswerRequest):
     try:
         result = check_answer(request.context, request.answer)
         return {"result": result}
