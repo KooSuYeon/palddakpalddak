@@ -1,0 +1,44 @@
+Quiz: 퀴즈: 머신러닝에서 "특징(Feature)"의 정의로 옳은 것은 무엇인가요? 
+
+1. 데이터를 예측하는 데 사용되는 개별 속성
+2. 모델의 가중치를 조정하는 과정
+3. 레이블을 예측하기 위해 필요한 데이터의 집합
+4. 머신러닝의 학습 결과로 생성되는 출력 데이터
+
+사용자의 대답을 기다리겠습니다!
+User Answer: 1
+Feedback: content='정답은 1번입니다! \n\n"특징(Feature)"는 머신러닝에서 데이터를 예측하는 데 사용되는 개별 속성을 의미합니다. 머신러닝 모델은 이러한 특징을 기반으로 학습하고, 이를 통해 예측을 수행하게 됩니다. \n\n다른 선택지들은 다음과 같은 이유로 부정확합니다:\n2. 모델의 가중치를 조정하는 과정은 "학습" 또는 "훈련" 과정과 관련이 있습니다.\n3. 레이블을 예측하기 위해 필요한 데이터의 집합은 "데이터셋"이나 "입력 데이터"에 해당합니다.\n4. 머신러닝의 학습 결과로 생성되는 출력 데이터는 "예측"이나 "결과"에 해당합니다.\n\n잘 하셨습니다! 더 궁금한 점이 있으면 언제든지 질문해 주세요!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 179, 'prompt_tokens': 181, 'total_tokens': 360, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-385fdd2f-95ab-4755-b875-67c7e9b8eb5d-0' usage_metadata={'input_tokens': 181, 'output_tokens': 179, 'total_tokens': 360, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: 나이브베이즈 분류기의 특징 중 하나는 무엇인가요? 다음 중 올바른 설명을 선택하세요.
+
+1. 나이브베이즈는 모든 특징들이 서로 독립적이라고 가정한다.
+2. 나이브베이즈는 특징들이 서로 종속적이라고 가정한다.
+3. 나이브베이즈는 특징들이 연속적이지 않다고 가정한다.
+4. 나이브베이즈는 데이터가 고정된 분포를 따른다고 가정한다.
+
+정답을 선택해주세요 (1, 2, 3, 4).
+User Answer: 1
+Feedback: content='정답은 1번입니다. 나이브베이즈 분류기는 모든 특징들이 서로 독립적이라고 가정하는 모델입니다. 이는 "나이브(naive)"라는 이름에서도 알 수 있듯이, 각 특성이 다른 특성과는 독립적이라는 단순한 가정을 기반으로 합니다. \n\n2번은 잘못된 설명으로, 나이브베이즈는 특징들이 서로 종속적이라고 가정하지 않습니다. 3번은 특징의 연속성에 대한 설명이 아니며, 나이브베이즈는 연속형 데이터도 처리할 수 있습니다. 4번은 나이브베이즈가 특정 분포를 따른다고 명시적으로 가정하지 않기 때문에 부정확합니다.\n\n따라서 1번이 올바른 답변입니다. 잘 하셨습니다!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 181, 'prompt_tokens': 223, 'total_tokens': 404, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-0a1ef7c3-b779-4ac3-8358-69b0d798d3b8-0' usage_metadata={'input_tokens': 223, 'output_tokens': 181, 'total_tokens': 404, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: SVM(Support Vector Machine)의 주요 기능 중 하나는 무엇인가요?
+
+1. 데이터의 군집을 찾는 것
+2. 데이터를 분류하기 위한 결정 경계를 찾는 것
+3. 데이터를 시각화하는 것
+4. 예측값을 생성하는 것
+
+정답을 선택해주세요!
+User Answer: 2
+Feedback: content='정답은 2번, "데이터를 분류하기 위한 결정 경계를 찾는 것"입니다. SVM(Support Vector Machine)은 주어진 데이터 포인트를 분류하기 위해 최적의 결정 경계를 찾는 알고리즘입니다. 이 결정 경계는 두 클래스 간의 마진을 최대화하여 분류 성능을 높입니다.\n\n1번 "데이터의 군집을 찾는 것"은 클러스터링 알고리즘의 기능에 해당합니다.\n3번 "데이터를 시각화하는 것"은 SVM의 기능이 아니며, 다른 기법이나 도구를 통해 수행할 수 있습니다.\n4번 "예측값을 생성하는 것"은 SVM의 결과로 예측을 할 수 있지만, SVM의 주요 기능은 결정 경계를 찾는 것입니다.\n\n잘 선택하셨습니다! 추가 질문이 있다면 언제든지 말씀해 주세요.' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 193, 'prompt_tokens': 165, 'total_tokens': 358, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-1eb01c4b-7db5-4313-9696-cc66a7224b48-0' usage_metadata={'input_tokens': 165, 'output_tokens': 193, 'total_tokens': 358, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
+Quiz: 퀴즈: 로지스틱 회귀는 어떤 종류의 학습 문제에 해당하나요? 
+
+1. 회귀(Regression)
+2. 분류(Classification)
+3. 군집화(Clustering)
+4. 비지도 학습(Unsupervised Learning)
+
+정답을 적어주세요!
+User Answer: 2
+Feedback: content='정답: 2. 분류(Classification)\n\n피드백: 잘 하셨습니다! 로지스틱 회귀는 주로 이진 분류 문제에 사용되는 통계적 모델로, 입력 변수와 이진 결과 간의 관계를 모델링합니다. 회귀 모델이지만, 출력은 확률로 해석되어 특정 클래스에 속할 가능성을 예측하는 데 사용되므로 "분류" 문제로 분류됩니다. 추가 질문이 있으면 언제든지 물어보세요!' additional_kwargs={'refusal': None} response_metadata={'token_usage': {'completion_tokens': 108, 'prompt_tokens': 148, 'total_tokens': 256, 'completion_tokens_details': {'accepted_prediction_tokens': 0, 'audio_tokens': 0, 'reasoning_tokens': 0, 'rejected_prediction_tokens': 0}, 'prompt_tokens_details': {'audio_tokens': 0, 'cached_tokens': 0}}, 'model_name': 'gpt-4o-mini-2024-07-18', 'system_fingerprint': 'fp_0705bf87c0', 'finish_reason': 'stop', 'logprobs': None} id='run-e4007bb1-4b2f-48a4-a65a-0de2bc6516dc-0' usage_metadata={'input_tokens': 148, 'output_tokens': 108, 'total_tokens': 256, 'input_token_details': {'audio': 0, 'cache_read': 0}, 'output_token_details': {'audio': 0, 'reasoning': 0}}
+--------------------------------------------------
