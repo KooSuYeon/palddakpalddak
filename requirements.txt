@@ -1,4 +1,10 @@
+ipykernel
+jupyter
 selenium
 webdriver-manager
 langchain
 nltk
+langchain
+langchain-openai
+langchain-community
+faiss-cpu

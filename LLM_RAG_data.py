@@ -39,11 +39,8 @@ def preprocess_text(text):
     # 2. 소문자 변환
     text = text.lower()
 
-    # 3. 구두점 및 특수 문자 제거
-    text = re.sub(r'[^\w\s]', '', text)
-
     # 4. 불용어 제거
-    stop_words = set(stopwords.words('english'))  # 영어 불용어 목록
+    stop_words = set(stopwords.words(''))
     word_tokens = word_tokenize(text)
     filtered_text = [word for word in word_tokens if word not in stop_words]
 
@@ -75,6 +72,15 @@ def fetch_page_content(urls):
 
     return all_texts
 
+def save_texts_to_file(texts, file_path):
+    with open(file_path, 'w', encoding='utf-8') as file:
+        for i, text in enumerate(texts):
+            file.write(f"URL {i + 1} content:\n")
+            file.write(text)
+            file.write("\n\n")
+
+
+
 def web_scrawl_contents():
     # 여러 URL 리스트
     urls = [
@@ -104,8 +110,8 @@ def web_scrawl_contents():
 
     # RecursiveCharacterTextSplitter를 사용하여 텍스트 분할
     recursive_text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=100,  # 덩어리 크기
-        chunk_overlap=10,  # 덩어리 겹침 크기
+        chunk_size=200,  # 덩어리 크기
+        chunk_overlap=40,  # 덩어리 겹침 크기
         length_function=len,
         is_separator_regex=False,
     )
@@ -123,5 +129,33 @@ def web_scrawl_contents():
         print(f"Chunk {idx+1}: {split.page_content[:10]}..")  # 앞부분 50자만 출력
 
 
+
+
+
 if __name__ == '__main__':
-    web_scrawl_contents()
+    # 여러 URL 리스트
+    urls = [
+        os.getenv('WEEK_1_LINK_1'),
+        os.getenv('WEEK_1_LINK_2'),
+        os.getenv('WEEK_1_LINK_3'),
+        os.getenv('WEEK_2_LINK_1'),
+        os.getenv('WEEK_2_LINK_2'),
+        os.getenv('WEEK_2_LINK_3'),
+        os.getenv('WEEK_3_LINK_1'),
+        os.getenv('WEEK_3_LINK_2'),
+        os.getenv('WEEK_3_LINK_3'),
+        os.getenv('WEEK_4_LINK_1'),
+        os.getenv('WEEK_4_LINK_2'),
+        os.getenv('WEEK_5_LINK_1'),
+        os.getenv('WEEK_5_LINK_2'),
+        os.getenv('WEEK_5_LINK_3'),
+        os.getenv('WEEK_5_LINK_4'),
+        os.getenv('WEEK_5_LINK_5'),
+        os.getenv('WEEK_5_LINK_6'),
+        os.getenv('WEEK_5_LINK_7')
+
+    ]
+
+    texts = fetch_page_content(urls)
+    save_texts_to_file(texts, 'output_texts.txt')
+
