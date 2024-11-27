@@ -9,3 +9,4 @@ requirements.txt
 # pip uninstall -r requirements.txt -y  # 모두 제거하기
 # pip uninstall 패키지 # 패키지 하나씩 지우기
 AI_boot
+.env
