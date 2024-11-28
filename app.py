@@ -57,7 +57,7 @@ async def get_history(user_id):
         raise HTTPException(status_code=404, detail="File not found")
     
 
-
+# 대화 불러오기 api
 @app.get("/get_history/{user_id}")
 async def get_history(user_id: int):
     # 파일 경로 패턴
