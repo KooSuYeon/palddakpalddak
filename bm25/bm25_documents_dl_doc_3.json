@@ -1,0 +1,116 @@
+[
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "[스파르타코딩클럽] 3. 딥러닝 실습 환경 구축📘[SCC] 기초가 탄탄한 딥러닝/📚[스파르타코딩클럽] 기초가 탄탄한 딥러닝 - 1주차/📕[스파르타코딩클럽] 3. 딥러닝 실습 환경 구축Made with📕[스파르타코딩클럽] 3. 딥러닝 실습 환경 구축[수업 목표]딥러닝 실습을 위한 환경을 구축해 봅시다[목차]01. conda를 이용한 환경 설정02.",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "conda를 이용한 환경 설정02. jupyter notebook 03. 가상환경 설치 및 jupyter notebook 연결 04. pytorch 설치​환경 활성화 {5px}환경 활성화 ﻿​PythonCopyconda activate myenv",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​필요한 패키지 설치 {5px}필요한 패키지 설치 ﻿​PythonCopyconda install numpy pandas matplotlib",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​02. jupyter notebook ✔️jupyter notebook이 무엇인지 알아보고 설치해 봅시다.1)  jupyter notebook 사용법☑️ jupyter notebook이란?Jupyter Notebook은 데이터 과학자와 연구자들이 코드를 작성하고 실행하며, 결과를 시각화하고 문서화할 수 있는 대화형 환경입니다.☑️ jupyter",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "환경입니다.☑️ jupyter notebook 설치Jupyter Notebook은 conda를 통해 쉽게 설치할 수 있습니다jupyter notebook 설치 {5px}jupyter notebook 설치 ﻿​PythonCopyconda install jupyter",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​☑️ jupyter notebook 시작하기Jupyter Notebook 실행jupyter notebook 실행 {5px}jupyter notebook 실행 ﻿​PythonCopyjupyter notebook",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​이 명령어를 실행하면 웹 브라우저가 열리고, Jupyter Notebook 인터페이스가 나타납니다.새로운 노트북 생성:Jupyter Notebook 인터페이스에서 \"New\" 버튼을 클릭하고, \"Python (myenv)\"를 선택하여 새로운 노트북을 생성합니다.코드 작성 및 실행:셀(Cell)에 코드를 작성하고, 셀을 선택한 후 \"Shift +",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "셀을 선택한 후 \"Shift + Enter\"를 눌러 코드를 실행합니다.03. 가상환경 설치 및 jupyter notebook 연결 ✔️가상환경이 무엇인지 알아보고 jupyter notebook과 가상환경을 연결해 봅시다1) 가상환경 설치 ☑️ 가상환경이란 무엇인가?가상환경(Virtual Environment)은 프로젝트마다 독립적인 파이썬 환경을",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "프로젝트마다 독립적인 파이썬 환경을 제공합니다.가상환경을 이용해 서로 다른 프로젝트 간의 패키지 충돌을 방지할 수 있습니다. Conda를 이용하면 쉽게 가상환경을 생성하고 관리할 수 있습니다.☑️ 가상환경 생성 및 관리가상 환경 생성 {5px}가상 환경 생성 ﻿​PythonCopyconda create --name myenv python=3.8",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​여기서 myenv 는 가상환경의 이름이며 python=3.8은 설치할 파이썬 버전입니다여기서 myenv 는 가상환경의 이름이며 python=3.8은 설치할 파이썬 버전입니다﻿​가상 환경 비활성화 {5px}가상 환경 비활성화 ﻿​PythonCopyconda deactivate",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​가상 환경 삭제 {5px}가상 환경 삭제 ﻿​PythonCopyconda remove --name myenv --all",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​2) jupyter notebook 연결☑️ jupyter notebook 연결가상환경을 Jupyter Notebook과 연결하여 사용할 수 있습니다이를 위해 ipykernel 패키지를 설치하고, 가상환경을 Jupyter Notebook에 커널로 추가합니다.ipykernel 설치 {5px}ipykernel 설치 ﻿​PythonCopyconda",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "﻿​PythonCopyconda install ipykernel",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​가상환경을 Jupyter Notebook에 커널로 추가 {5px}가상환경을 Jupyter Notebook에 커널로 추가 ﻿​PythonCopypython -m ipykernel install --user --name myenv --display-name \"Python (myenv)\"",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​여기서 myenv는 가상환경의 이름이며, \"Python (myenv)\"는 Jupyter Notebook에서 표시될 커널 이름입니다.여기서 myenv는 가상환경의 이름이며, \"Python (myenv)\"는 Jupyter Notebook에서 표시될 커널 이름입니다.﻿​04. pytorch 설치✔️conda를 이용해 pytorch 설치해 봅시다1)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "pytorch 설치해 봅시다1) pytorch 설치☑️ pytorch란 무엇인가?PyTorch는 Facebook에서 개발한 오픈 소스 딥러닝 라이브러리로, 동적 계산 그래프(dynamic computation graph)를 지원하여 유연하고 직관적인 모델 설계가 가능합니다.☑️ pytorch 설치PyTorch는 conda를 통해 쉽게 설치할 수",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "conda를 통해 쉽게 설치할 수 있습니다.설치 명령어는 운영체제와 CUDA 버전에 따라 다르므로, PyTorch 공식 웹사이트에서 설치 명령어를 확인할 수 있습니다. 예를 들어, CUDA 10.2를 사용하는 Windows 환경에서는 다음과 같이 설치할 수 있습니다:pytorch 설치 {5px}pytorch 설치 ﻿​PythonCopyconda",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "﻿​PythonCopyconda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​Copyright ⓒ TeamSparta All rights reserved.",
+        "type": "Document"
+    }
+]

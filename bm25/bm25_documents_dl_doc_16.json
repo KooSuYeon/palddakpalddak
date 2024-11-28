@@ -1,0 +1,170 @@
+[
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "[스파르타코딩클럽] 16. 모델 평가와 검증 및 Pytorch 문법 정리📘[SCC] 기초가 탄탄한 딥러닝/📚[스파르타코딩클럽] 기초가 탄탄한 딥러닝 - 6주차/📕[스파르타코딩클럽] 16. 모델 평가와 검증 및 Pytorch 문법 정리Made with📕[스파르타코딩클럽] 16. 모델 평가와 검증 및 Pytorch 문법 정리[수업 목표]교차검증이 무엇인지, 왜",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "목표]교차검증이 무엇인지, 왜 필요한지 알아봅시다[목차]01. 교차검증 02. Pytorch 문법 정리  - 각 폴드가 한 번씩 검증 데이터로 사용되며, 나머지 폴드는 학습 데이터로 사용됩니다.{",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "- 각 폴드가 한 번씩 검증 데이터로 사용되며, 나머지 폴드는 학습 데이터로 사용됩니다.} - 각 폴드가 한 번씩 검증 데이터로 사용되며, 나머지 폴드는 학습 데이터로 사용됩니다.﻿\n - 모든 폴드에 대한 검증 결과를 평균하여 모델의 성능을 평가합니다.{",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "- 모든 폴드에 대한 검증 결과를 평균하여 모델의 성능을 평가합니다.} - 모든 폴드에 대한 검증 결과를 평균하여 모델의 성능을 평가합니다.﻿​☑️ 교차검증의 필요성과적합 방지: 교차 검증은 모델이 특정 데이터셋에 과적합되지 않도록 도와줍니다.일반화 성능 평가: 교차 검증은 모델의 일반화 성능을 더 정확하게 평가할 수 있습니다.데이터 효율성: 교차 검증은",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "효율성: 교차 검증은 데이터를 최대한 활용하여 모델을 평가할 수 있습니다.2) K-Fold 교차 검증☑️ K-Fold 교차 검증의 원리데이터를 K개의 폴드로 나눕니다.각 폴드가 한 번씩 검증 데이터로 사용되며, 나머지 K-1개의 폴드는 학습 데이터로 사용됩니다.K번의 학습과 검증을 반복하여, 각 폴드에 대한 검증 결과를 평균하여 모델의 성능을",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "검증 결과를 평균하여 모델의 성능을 평가합니다.☑️ 적용 방법데이터를 K개의 폴드로 나누고, 각 폴드에 대해 학습과 검증을 수행합니다.각 폴드에 대한 검증 결과를 저장하고, 최종적으로 평균하여 모델의 성능을 평가합니다.02. Pytorch 문법 정리 ✔️한번 문법을 살펴볼까요?1) Pytorch☑️ PytorchPyTorch는 딥러닝 프레임워크로,",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "딥러닝 프레임워크로, 유연성과 사용 편의성을 제공하여 연구와 개발에서 널리 사용되고 있습니다. PyTorch의 주요 API를 기법별, 모델별, 기능별로 정리하겠습니다.PyTorch의 주요 API 정리1. 모델 구축 및 학습기본 모델 구축torch.nn.Module: 모든 신경망 모델의 기본 클래스입니다.PythonCopyimport torch.nn as",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "torch.nn as nn",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "class MyModel(nn.Module):\ndef __init__(self):\nsuper(MyModel, self).__init__()\n        self.layer1 = nn.Linear(10, 20)\ndef forward(self, x):\n        x = self.layer1(x)\nreturn x",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​손실 함수torch.nn.CrossEntropyLoss: 분류 문제에 주로 사용됩니다.PythonCopyloss_fn = nn.CrossEntropyLoss()\n\n​torch.nn.MSELoss: 회귀 문제에 주로 사용됩니다.PythonCopyloss_fn = nn.MSELoss()",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​최적화 알고리즘torch.optim.SGD: 확률적 경사 하강법 최적화 알고리즘입니다.PythonCopyoptimizer = torch.optim.SGD(model.parameters(), lr=0.01)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​torch.optim.Adam: Adam 최적화 알고리즘입니다.PythonCopyoptimizer = torch.optim.Adam(model.parameters(), lr=0.001)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​2. 데이터 로드 및 전처리데이터셋 및 데이터로더torch.utils.data.Dataset: 사용자 정의 데이터셋을 만들기 위한 기본 클래스입니다.PythonCopyfrom torch.utils.data import Dataset",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "class MyDataset(Dataset):\ndef __init__(self, data, targets):\n        self.data = data\n        self.targets = targets",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "def __len__(self):\nreturn len(self.data)\ndef __getitem__(self, idx):\nreturn self.data[idx], self.targets[idx]",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​torch.utils.data.DataLoader: 미니 배치 학습을 위한 데이터 로더입니다.PythonCopyfrom torch.utils.data import DataLoader",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "dataset = MyDataset(data, targets)\ndataloader = DataLoader(dataset, batch_size=32, shuffle=True)\n\n​데이터 변환torchvision.transforms: 이미지 데이터 변환을 위한 유틸리티입니다.PythonCopyfrom torchvision import transforms",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "transform = transforms.Compose([\n    transforms.ToTensor(),\n    transforms.Normalize((0.5,), (0.5,))\n])",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​3. GPU 사용GPU 설정 및 텐서 이동모델을 GPU로 이동PythonCopydevice = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\nmodel.to(device)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​텐서를 GPU로 이동PythonCopyinputs, targets = inputs.to(device), targets.to(device)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​4. 모델 기법별 API합성곱 신경망 (CNN)torch.nn.Conv2d: 2D 합성곱 레이어입니다.PythonCopyconv_layer = nn.Conv2d(in_channels=1, out_channels=32, kernel_size=3, stride=1, padding=1)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​순환 신경망 (RNN)torch.nn.RNN: 기본 순환 신경망 레이어입니다.PythonCopyrnn_layer = nn.RNN(input_size=10, hidden_size=20, num_layers=2, batch_first=True)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​torch.nn.LSTM: LSTM 레이어입니다.PythonCopylstm_layer = nn.LSTM(input_size=10, hidden_size=20, num_layers=2, batch_first=True)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​torch.nn.GRU: GRU 레이어입니다.PythonCopygru_layer = nn.GRU(input_size=10, hidden_size=20, num_layers=2, batch_first=True)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​트랜스포머 (Transformer)torch.nn.Transformer: 트랜스포머 모델입니다.PythonCopytransformer_model = nn.Transformer(nhead=8, num_encoder_layers=6)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​torch.nn.TransformerEncoderLayer: 트랜스포머 인코더 레이어입니다.PythonCopyencoder_layer = nn.TransformerEncoderLayer(d_model=512, nhead=8)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​5. 유틸리티 함수저장 및 로드모델 저장PythonCopytorch.save(model.state_dict(), 'model.pth')\n\n​모델 로드PythonCopymodel.load_state_dict(torch.load('model.pth'))\nmodel.eval()",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​학습 및 평가 모드 설정모델을 학습 모드로 설정PythonCopymodel.train()\n\n​모델을 평가 모드로 설정PythonCopymodel.eval()\n\n​Copyright ⓒ TeamSparta All rights reserved.",
+        "type": "Document"
+    }
+]

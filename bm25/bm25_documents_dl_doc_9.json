@@ -1,0 +1,116 @@
+[
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "[스파르타코딩클럽] 9. ResNet📘[SCC] 기초가 탄탄한 딥러닝/📚[스파르타코딩클럽] 기초가 탄탄한 딥러닝 - 4주차/📕[스파르타코딩클럽] 9. ResNetMade with📕[스파르타코딩클럽] 9. ResNet[수업 목표]비전 모델의 길을 열어준 ResNet!왜 좋은 지 한번 알아봅시다[목차]01. 개념import torch.nn as nn",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "import torch.nn.functional as F",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "class Block(nn.Module):\ndef __init__(self, in_ch, out_ch, stride=1):\nsuper(Block, self).__init__()\n# 첫 번째 컨볼루션 레이어",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# 첫 번째 컨볼루션 레이어\n        self.conv1 = nn.Conv2d(in_ch, out_ch, kernel_size=3, stride=stride, padding=1, bias=False)\n        self.bn1 = nn.BatchNorm2d(out_ch) # 배치 정규화\n# 두 번째 컨볼루션 레이어",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# 두 번째 컨볼루션 레이어\n        self.conv2 = nn.Conv2d(out_ch, out_ch, kernel_size=3, stride=1, padding=1, bias=False)\n        self.bn2 = nn.BatchNorm2d(out_ch) # 배치 정규화\n# 입력과 출력의 차원이 다를 경우 shortcut 경로 정의",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "self.skip_connection = nn.Sequential()\nif stride != 1 or in_ch != out_ch:\n            self.skip_connection = nn.Sequential(",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "nn.Conv2d(in_ch, out_ch, kernel_size=1, stride=stride, bias=False), # 차원 맞추기 위한 1x1 컨볼루션\n                nn.BatchNorm2d(out_ch) # 배치 정규화\n)\ndef forward(self, x):",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# 첫 번째 컨볼루션 + ReLU 활성화 함수\n        output = F.relu(self.bn1(self.conv1(x)))\n# 두 번째 컨볼루션 후 배치 정규화\n        output = self.bn2(self.conv2(output))\n# shortcut 경로 출력과 현재 블록의 출력 더하기",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "output += self.skip_connection(x)\n# 최종 ReLU 활성화 함수 적용\n        output = F.relu(output)\nreturn output",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# ResNet 모델 정의\nclass CustomResNet(nn.Module):\ndef __init__(self, block, layers, num_classes=10):\nsuper(CustomResNet, self).__init__()\n        self.initial_channels = 64 # 첫 번째 레이어의 입력 채널 수 정의",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# 첫 번째 컨볼루션 레이어\n        self.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=1, bias=False)\n        self.bn1 = nn.BatchNorm2d(64) # 배치 정규화\n# ResNet의 각 레이어 생성",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# ResNet의 각 레이어 생성\n        self.layer1 = self._create_layer(block, 64, layers[0], stride=1)\n        self.layer2 = self._create_layer(block, 128, layers[1], stride=2)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "self.layer3 = self._create_layer(block, 256, layers[2], stride=2)\n        self.layer4 = self._create_layer(block, 512, layers[3], stride=2)\n# 평균 풀링 레이어",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# 평균 풀링 레이어\n        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))\n# 최종 완전 연결 레이어\n        self.fc = nn.Linear(512, num_classes)\n# ResNet의 각 레이어를 생성하는 함수",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "def _create_layer(self, block, out_ch, num_layers, stride):\n        layer_list = []\n# 첫 번째 블록은 stride를 받을 수 있음\n        layer_list.append(block(self.initial_channels, out_ch, stride))",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "self.initial_channels = out_ch  # 다음 블록을 위해 채널 수 업데이트\n# 나머지 블록들은 기본 stride를 사용\nfor _ in range(1, num_layers):\n            layer_list.append(block(out_ch, out_ch))",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "return nn.Sequential(*layer_list)\ndef forward(self, x):\n# 첫 번째 컨볼루션 + ReLU 활성화 함수\n        x = F.relu(self.bn1(self.conv1(x)))\n# 각 레이어를 순차적으로 통과\n        x = self.layer1(x)\n        x = self.layer2(x)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "x = self.layer3(x)\n        x = self.layer4(x)\n# 평균 풀링 및 텐서의 차원 축소\n        x = self.avgpool(x)\n        x = torch.flatten(x, 1)\n# 최종 완전 연결 레이어를 통해 클래스별 예측값 출력\n        x = self.fc(x)\nreturn x",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "# Custom ResNet-18 모델 생성 (각 레이어의 블록 수는 2개씩)\nmodel = CustomResNet(Block, [2, 2, 2, 2], num_classes=10)\n\n​Copyright ⓒ TeamSparta All rights reserved.",
+        "type": "Document"
+    }
+]

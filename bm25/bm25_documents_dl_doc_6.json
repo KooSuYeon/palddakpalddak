@@ -1,0 +1,164 @@
+[
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "[스파르타코딩클럽] 6. 순환 신경망(RNN)📘[SCC] 기초가 탄탄한 딥러닝/📚[스파르타코딩클럽] 기초가 탄탄한 딥러닝 - 2주차/📕[스파르타코딩클럽] 6. 순환 신경망(RNN)Made with📕[스파르타코딩클럽] 6. 순환 신경망(RNN)[수업 목표]순환 신경망(RNN) 개념에 대해서 배워보고 어떤 원리로 동작하는지 알아봅시다Pytorch로 간단한",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "알아봅시다Pytorch로 간단한 RNN 모델 구현 실습을 진행해 봅시다[목차]01. RNN의 기본 구조와 동작 원리02. RNN과 LSTM을 이용한 시계열 데이터 예측 (PyTorch)import torch.nn as nn",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "import torch.optim as optim\nimport numpy as np\nimport matplotlib.pyplot as plt\n​☑️데이터셋 생성 및 전처리데이터셋 생성 및 전처리 {5px}데이터셋 생성 및 전처리 ﻿​PythonCopy# Sine 파형 데이터 생성",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "def create_sine_wave_data(seq_length, num_samples):\n    X = []\n    y = []\nfor _ in range(num_samples):\n        start = np.random.rand()\n        x = np.linspace(start, start + 2 * np.pi, seq_length)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "X.append(np.sin(x))\n        y.append(np.sin(x + 0.1))\nreturn np.array(X), np.array(y)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "seq_length = 50\nnum_samples = 1000\nX, y = create_sine_wave_data(seq_length, num_samples)\n# 데이터셋을 PyTorch 텐서로 변환\nX = torch.tensor(X, dtype=torch.float32).unsqueeze(-1)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "y = torch.tensor(y, dtype=torch.float32).unsqueeze(-1)\n​☑️ 간단한 RNN 모델 정의간단한 RNN 모델 정의 {5px}간단한 RNN 모델 정의 ﻿​PythonCopyclass SimpleRNN(nn.Module):",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "def __init__(self, input_size, hidden_size, output_size):\nsuper(SimpleRNN, self).__init__()\n        self.rnn = nn.RNN(input_size, hidden_size, batch_first=True)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "self.fc = nn.Linear(hidden_size, output_size)\ndef forward(self, x):\n        h0 = torch.zeros(1, x.size(0), hidden_size) # 초기 은닉 상태\n        out, _ = self.rnn(x, h0)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "out = self.fc(out[:, -1, :]) # 마지막 시간 단계의 출력\nreturn out",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "input_size = 1\nhidden_size = 32\noutput_size = 1\nmodel = SimpleRNN(input_size, hidden_size, output_size)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​nn.RNN: 순환 신경망(RNN) 층을 정의합니다.nn.RNN(input_size, hidden_size, batch_first)는 입력 크기, 은닉 상태 크기, 배치 차원을 첫 번째로 설정합니다..RNN(input_size, hidden_size, batch_first)는 입력 크기, 은닉 상태 크기, 배치 차원을 첫 번째로",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "상태 크기, 배치 차원을 첫 번째로 설정합니다.﻿​nn.Linear: 선형 변환을 적용하는 완전 연결(fully connected) 레이어를 정의합니다.nn.Linear(in_features, out_features)는 입력 특징의 수와 출력 특징의 수를 지정합니다..Linear(in_features, out_features)는 입력 특징의 수와 출력",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "입력 특징의 수와 출력 특징의 수를 지정합니다.﻿​☑️ 간단한 LSTM 모델 정의간단한 LSTM 모델 정의 {5px}간단한 LSTM 모델 정의 ﻿​PythonCopyclass SimpleLSTM(nn.Module):",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "def __init__(self, input_size, hidden_size, output_size):\nsuper(SimpleLSTM, self).__init__()\n        self.lstm = nn.LSTM(input_size, hidden_size, batch_first=True)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "self.fc = nn.Linear(hidden_size, output_size)\ndef forward(self, x):\n        h0 = torch.zeros(1, x.size(0), hidden_size) # 초기 은닉 상태",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "c0 = torch.zeros(1, x.size(0), hidden_size) # 초기 셀 상태\n        out, _ = self.lstm(x, (h0, c0))\n        out = self.fc(out[:, -1, :]) # 마지막 시간 단계의 출력\nreturn out",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "model = SimpleLSTM(input_size, hidden_size, output_size)",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​nn.LSTM: 장단기 메모리(LSTM) 층을 정의합니다.nn.LSTM(input_size, hidden_size, batch_first)는 입력 크기, 은닉 상태 크기, 배치 차원을 첫 번째로 설정합니다..LSTM(input_size, hidden_size, batch_first)는 입력 크기, 은닉 상태 크기, 배치 차원을 첫 번째로",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "상태 크기, 배치 차원을 첫 번째로 설정합니다.﻿​☑️ 모델 학습모델 학습 {5px}모델 학습 ﻿​PythonCopy# 손실 함수와 최적화 알고리즘 정의",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "criterion = nn.MSELoss()\noptimizer = optim.Adam(model.parameters(), lr=0.01)\n# 모델 학습\nnum_epochs = 100\nfor epoch in range(num_epochs):\n    outputs = model(X)\n    optimizer.zero_grad()",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "loss = criterion(outputs, y)\n    loss.backward()\n    optimizer.step()\nif (epoch + 1) % 10 == 0:\nprint(f'Epoch [{epoch + 1}/{num_epochs}], Loss: {loss.item():.4f}')\nprint('Finished Training')",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "​nn.MSELoss: 평균 제곱 오차(MSE) 손실 함수를 정의합니다.optim.Adam: Adam 최적화 알고리즘을 정의합니다. lr은 학습률을 지정합니다.optimizer.zero_grad(): 이전 단계에서 계산된 기울기를 초기화합니다.loss.backward(): 역전파를 통해 기울기를 계산합니다.optimizer.step(): 계산된 기울기를",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "계산된 기울기를 바탕으로 가중치를 업데이트합니다.☑️ 모델 평가 및 시각화모델 평가 및 시각화 {5px}모델 평가 및 시각화 ﻿​PythonCopy# 모델 평가",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "model.eval()\nwith torch.no_grad():\n    predicted = model(X).detach().numpy()\n# 시각화\nplt.figure(figsize=(10, 5))\nplt.plot(y.numpy().flatten(), label='True')",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "plt.plot(predicted.flatten(), label='Predicted')\nplt.legend()\nplt.show()",
+        "type": "Document"
+    },
+    {
+        "id": null,
+        "metadata": {},
+        "page_content": "plt.show()\n​model.eval(): 모델을 평가 모드로 전환합니다.torch.no_grad(): 평가 단계에서는 기울기를 계산할 필요가 없으므로, 이를 비활성화하여 메모리 사용을 줄입니다.detach(): 텐서를 계산 그래프에서 분리합니다.Copyright ⓒ TeamSparta All rights reserved.",
+        "type": "Document"
+    }
+]
