@@ -254,7 +254,11 @@ def is_similar(new_quiz, quiz_list, threshold=0.8):
     return any(sim >= threshold for sim in similarities[0])
 
 
-def get_question(type_:str, order:str, api_key:str):
+def get_question(type_:str, order:str):
+
+    load_dotenv()
+    api_key = os.getenv("OPEN_AI_KEY")
+
     global current_index
     global quiz_list
     print(current_index)
@@ -287,9 +291,18 @@ def get_question(type_:str, order:str, api_key:str):
         if len(quiz_list) == 0 or not is_similar(response, quiz_list, 0.7):
             break
 
-    return response
+    if (type_=="open_source"):
+        discription = get_discription(response, type_, order, get_llm(api_key), api_key)
+        question = ''.join([discription.content, str(response)])
+        return question
+    
+    return ''.join(response)
 
-def get_feedback(quiz:str, user_answer:str, api_key:str):
+def get_feedback(quiz:str, user_answer:str):
+
+    load_dotenv()
+    api_key = os.getenv("OPEN_AI_KEY")
+
     global current_index
     print(current_index)
     print(*quiz_list)
@@ -312,58 +325,54 @@ def get_feedback(quiz:str, user_answer:str, api_key:str):
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
     current_index += 5
 
-    return feedback
+    return feedback.content
 
 
 
-def get_discription(quiz, type_, order, llm, api_key):
-    discription_chain = discription_prompt | llm
+def get_discription(quiz, type_, order):
+
+    load_dotenv()
+    api_key = os.getenv("OPEN_AI_KEY")
+
+    discription_chain = discription_prompt | get_llm(api_key)
     txt_list = choose_txt_list(type_)
     retriever = get_retriever(txt_list[order-1], current_index, api_key)
     discription = discription_chain.invoke({"quiz": quiz, "context": retriever})
 
     return discription
 
-def run_rag_chatbot(type_, order):
+# def run_rag_chatbot(type_, order, user_):
 
-    global j
-    global quiz_list
+#     global j
+#     global quiz_list
 
-    load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+#     load_dotenv()
+#     api_key = os.getenv("OPEN_AI_KEY")
 
-    question = ""
+#     question = ""
 
-    quiz = get_question(type_, order, api_key)
-    quiz_list.append(quiz)
-    llm = get_llm(api_key)
-
-    if (type_=="open_source"):
-        discription = get_discription(quiz, type_, order, llm, api_key)
-        question = ''.join([discription.content, str(quiz)])
-    else:
-        question = ''.join(quiz)
+#     quiz = get_question(type_, order, api_key)
+#     quiz_list.append(quiz)
+#     j+=1
+#     save_file(''.join(question), f"quiz_list_{j}.txt")
         
-    j+=1
-    save_file(''.join(question), f"quiz_list_{j}.txt")
-        
-    # 2. 사용자 답변 수집
-    user_answer = input("답변을 입력하세요 힌트를 원한다면 help를, 종료를 원하시면 exit을 입력해주세요.: ").strip()
+#     # 2. 사용자 답변 수집
+#     user_answer = input("답변을 입력하세요 종료를 원하시면 exit을 입력해주세요.: ").strip()
     
 
-    if user_answer.strip().lower() == "exit":
-        print("=========== 대화를 종료합니다.")
-        return 
+#     if user_answer.strip().lower() == "exit":
+#         print("=========== 대화를 종료합니다.")
+#         return 
             
         
-    if not user_answer:
-        print("=============== 답변이 비어 있습니다. 다시 입력해주세요.")
-        return 
+#     if not user_answer:
+#         print("=============== 답변이 비어 있습니다. 다시 입력해주세요.")
+#         return 
     
-    save_file(''.join(user_answer), f"answer_list_{j}.txt")
+#     save_file(''.join(user_answer), f"answer_list_{j}.txt")
 
-    feedback = get_feedback(quiz, user_answer, api_key)
-    save_file(''.join(str(feedback.content)), f"feedback_list_{j}.txt")
+#     feedback = get_feedback(quiz, user_answer, api_key)
+#     save_file(''.join(str(feedback.content)), f"feedback_list_{j}.txt")
     
 
         
@@ -378,14 +387,3 @@ if __name__ == '__main__':
     current_index = 0
     j = 0
     valid_type = ["dl", "ml", "llm", "python", "open_source"]
-
-    while True:
-        type_ = input("교재 타입을 반드시!(dl, ml, llm, python, open_source) 안에서 입력해주세요!")
-        order = int(input("선택하실 교재의 챕터를 입력해주세요! 종료를 원하신다면 0을 입력해주세요!"))
-
-        if order == 0:
-            break
-        elif type_ not in valid_type:
-            continue
-
-        run_rag_chatbot(type_, order)
