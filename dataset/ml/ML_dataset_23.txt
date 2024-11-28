@@ -1,0 +1,29 @@
+[스파르타코딩클럽] 23강. 앙상블 학습 - XGBoost📘[SCC] 바닥부터 시작하는 머신러닝/📚[스파르타코딩클럽] 바닥부터 시작하는 머신러닝 - 5주차/📕[스파르타코딩클럽] 23강. 앙상블 학습 - XGBoostMade with📕[스파르타코딩클럽] 23강. 앙상블 학습 - XGBoost[수업 목표]앙상블 학습의 XGBoost에 대해서 배우고 실습해 봅시다[목차]01. XGBoost02.XGBoost 실습from sklearn.tree import DecisionTreeRegressor
+from sklearn.metrics import mean_squared_error
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+# 유방암 데이터 로드
+cancer_data = load_breast_cancer()
+X, y = cancer_data.data, cancer_data.target
+
+# 데이터 분할
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# 데이터 스케일링
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+​☑️ XGBoost 모델 구현 및 평가XGBoost 라이브러리를 사용하여 XGBoost 모델을 구현하고 평가합니다.XGBoost 모델 구현 및 평가 {5px}XGBoost 모델 구현 및 평가 ﻿​PythonCopyimport xgboost as xgb
+from sklearn.metrics import mean_squared_error
+
+# XGBoost 모델 생성
+xgb_model = xgb.XGBRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+# 모델 학습
+xgb_model.fit(X_train_scaled, y_train)
+# 예측
+y_pred_xgb = xgb_model.predict(X_test_scaled)
+# 평가
+mse_xgb = mean_squared_error(y_test, y_pred_xgb)
+print(f'XGBoost 모델의 MSE: {mse_xgb}')
+​Copyright ⓒ TeamSparta All rights reserved.

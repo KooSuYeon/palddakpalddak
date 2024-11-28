@@ -1,0 +1,23 @@
+Pandas 설치 및 Jupyter Notebook 설정하기 📕인공지능을 위한 파이썬 라이브러리/📘인공지능을 위한 파이썬 라이브러리 - 1주차/2️⃣Pandas 설치 및 Jupyter Notebook 설정하기 Made with2️⃣Pandas 설치 및 Jupyter Notebook 설정하기 수업 목표Pandas 설치를 진행합니다.Jupyter Notebook 설정 방법에 대해서 학습합니다.목차판다스(Pandas) 설치하기Jupyter Notebook 설정하기 📝Conda와 가상환경 설정하기가상환경을 Jupyter Notebook과 연결하기알면 좋은 Tip!판다스(Pandas) 설치하기판다스(Pandas)란?📚판다스는 데이터 조작 및 분석을 위한 파이썬 라이브러리입니다.
+데이터프레임(DataFrame)을 사용해 엑셀과 유사한 방식으로 데이터를 다룰 수 있습니다.판다스 설치하기ShellCopypip install pandas
+
+​위 명령어를 실행하면 pip을 통해 판다스가 설치됩니다!Jupyter Notebook 설정하기 📝Jupyter Notebook이란?📚Jupyter Notebook은 코드, 텍스트, 이미지 등을 한 곳에서 관리할 수 있는 대화형 컴퓨팅 환경입니다.
+데이터 분석, 머신러닝, 교육 등 다양한 분야에서 사용됩니다.Jupyter Notebook 설치하기ShellCopypip install jupyter
+
+​이 명령어로 Jupyter Notebook을 설치할 수 있습니다.Jupyter Notebook 실행하기ShellCopyjupyter notebook
+
+​명령어를 실행하면 웹 브라우저가 열리며 Jupyter Notebook 인터페이스로 이동합니다.Conda와 가상환경 설정하기Conda란?Conda는 파이썬 패키지 관리 및 가상환경 관리를 돕는 도구입니다.여러 프로젝트에 서로 다른 패키지 버전을 사용해야 할 때 유용합니다.
+
+Conda 설치하기Anaconda나 Miniconda를 설치하여 Conda를 사용할 수 있습니다.설치 후, Conda 명령어를 사용할 수 있습니다.
+
+가상환경 만들기ShellCopyconda create --name myenv
+
+​위 명령어로 myenv라는 이름의 가상환경을 만듭니다.ShellCopyconda create --name myenv python=3.8 pandas
+​원하는 파이썬 버전과 패키지를 지정할 수도 있습니다.가상환경 활성화 및 비활성화가상환경 활성화:ShellCopyconda activate myenv
+
+​가상환경 비활성화:ShellCopyconda deactivate
+​가상환경을 Jupyter Notebook과 연결하기ipykernel 설치가상환경을 Jupyter Notebook에서 사용하려면 ipykernel을 설치해야 합니다.ShellCopypip install ipykernel
+
+​가상환경을 Jupyter Notebook에 추가하기ShellCopypython -m ipykernel install --user --name myenv --display-name "My Env"
+
+​이 명령어를 실행하면 Jupyter Notebook에서 My Env라는 이름으로 가상환경을 선택할 수 있습니다.Jupyter Notebook에서 가상환경 사용하기ALTJupyter Notebook에서 새로운 노트북을 열 때,  My Env를 선택합니다.알면 좋은 Tip!Conda 가상환경 관리 conda env list 명령어로 현재 사용 가능한 가상환경을 확인할 수 있습니다.Jupyter Notebook 확장 다양한 Jupyter Notebook 확장을 설치해 기능을 확장해 보세요! nbextensions 패키지를 사용하면 많은 유용한 확장을 사용할 수 있습니다.📚이렇게 하면 판다스와 Jupyter Notebook 설정이 모두 완료되었습니다! ✨AnonymousSep 25아이콘 제거

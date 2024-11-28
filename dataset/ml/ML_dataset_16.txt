@@ -1,0 +1,42 @@
+[스파르타코딩클럽] 16강. 비지도학습 : 군집화모델 - DBSCAN📘[SCC] 바닥부터 시작하는 머신러닝/📚[스파르타코딩클럽] 바닥부터 시작하는 머신러닝 - 4주차 /📕[스파르타코딩클럽] 16강. 비지도학습 : 군집화모델 - DBSCANMade with📕[스파르타코딩클럽] 16강. 비지도학습 : 군집화모델 - DBSCAN[수업 목표]비지도학습 군집화모델 중 DBSCAN 에 대한 개념을 배우고, 데이터를 이용해 실습해 봅니다[목차]01. DBSCAN 개념02. DBSCAN 실습eps: 두 데이터 포인트가 같은 군집에 속하기 위해 가져야 하는 최대 거리입니다.: 두 데이터 포인트가 같은 군집에 속하기 위해 가져야 하는 최대 거리입니다.﻿​min_samples: 한 군집을 형성하기 위해 필요한 최소 데이터 포인트 수입니다_samples: 한 군집을 형성하기 위해 필요한 최소 데이터 포인트 수입니다﻿​☑️ DBSCAN의 작동 원리임의의 데이터 포인트를 선택합니다.선택한 데이터 포인트의 eps 반경 내에 있는 모든 데이터 포인트를 찾습니다.eps 반경 내의 데이터수 ≥ min_samples : 해당 데이터 포인트를 중심으로 새로운 군집 형성.eps 반경 내의 데이터수 < min_samples : 해당 데이터 포인트를 노이즈로 간주군집에 속한 데이터 포인트에 대해 2~4 단계를 반복합니다.모든 데이터 포인트가 처리될 때까지 이 과정을 반복합니다.☑️ DBSCAN의 장점비구형 군집 탐지: DBSCAN은 비구형 군집을 탐지할 수 있습니다.노이즈 처리: DBSCAN은 노이즈를 효과적으로 처리할 수 있습니다.군집 수 자동 결정: DBSCAN은 군집 수를 사전에 지정할 필요가 없습니다.02. DBSCAN 실습✔️Kaggle 쇼핑몰 데이터를 이용하여 DBSCAN 실습을 진행합니다1) 쇼핑몰 데이터☑️ 데이터 로드 쇼핑몰 데이터 로드 {5px}쇼핑몰 데이터 로드 ﻿​PythonCopyimport pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch
+
+# 데이터셋 불러오기
+df = pd.read_csv('Mall_Customers.csv')
+# 데이터 확인
+print(df.head())
+# 필요한 열만 선택
+X = df[['Age', 'Annual Income (k$)', 'Spending Score (1-100)']]
+# 데이터 정규화
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+​☑️ DBSCAN 수행Scikit-learn의 DBSCAN을 사용하여 DBSCAN 군집화를 수행합니다.DBSCAN수행 {5px}DBSCAN수행 ﻿​PythonCopyfrom sklearn.cluster import DBSCAN
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# DBSCAN 모델 생성
+dbscan = DBSCAN(eps=5, min_samples=5)
+# 모델 학습 및 예측
+df['Cluster'] = dbscan.fit_predict(X)
+# 군집화 결과 시각화
+plt.figure(figsize=(10, 7))
+sns.scatterplot(x='Annual Income (k$)', y='Spending Score (1-100)', hue='Cluster', data=df, palette='viridis')
+plt.title('DBSCAN Clustering of Mall Customers')
+plt.show()
+​☑️ 파라미터 튜닝DBSCAN의 성능은 eps와 min_samples 파라미터에 크게 의존합니다. 적절한 파라미터를 찾기 위해 여러 값을 시도해볼 수 있습니다.파라미터 튜닝 {5px}파라미터 튜닝 ﻿​PythonCopy# 다양한 eps와 min_samples 값 시도
+eps_values = [3, 5, 7, 10]
+min_samples_values = [3, 5, 7, 10]
+for eps in eps_values:
+for min_samples in min_samples_values:
+        dbscan = DBSCAN(eps=eps, min_samples=min_samples)
+        df['Cluster'] = dbscan.fit_predict(X)
+        
+        plt.figure(figsize=(10, 7))
+        sns.scatterplot(x='Annual Income (k$)', y='Spending Score (1-100)', hue='Cluster', data=df, palette='viridis')
+        plt.title(f'DBSCAN Clustering (eps={eps}, min_samples={min_samples})')
+        plt.show()
+​Copyright ⓒ TeamSparta All rights reserved.

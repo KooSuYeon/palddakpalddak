@@ -1,0 +1,79 @@
+NumPy 배열(array) 생성 및 기초 연산📕인공지능을 위한 파이썬 라이브러리/📘인공지능을 위한 파이썬 라이브러리 - 2주차/2️⃣NumPy 배열(array) 생성 및 기초 연산Made with2️⃣NumPy 배열(array) 생성 및 기초 연산수업 목표NumPy 배열 생성 및 기초 연산에 대해 학습합니다.목차NumPy 배열(array) 생성하기NumPy 배열의 기초 연산 배열의 인덱싱과 슬라이싱요약NumPy 배열(array) 생성하기📚NumPy 배열은 파이썬의 리스트와 비슷하지만, 더 강력하고 효율적인 기능을 제공합니다. 배열을 생성하는 다양한 방법을 살펴볼까요?리스트로부터 배열 생성리스트를 배열로 변환할 수 있습니다.PythonCopyimport numpy as np
+
+# 리스트로부터 배열 생성
+arr = np.array([1, 2, 3, 4, 5])
+print(arr)
+
+​출력 결과:Plain TextCopy[1 2 3 4 5]
+
+​다양한 형태의 배열 생성0으로 채워진 배열 생성PythonCopyzero_arr = np.zeros((2, 3)) # 2x3 크기의 배열
+print(zero_arr)
+
+​출력 결과Plain TextCopy[[0. 0. 0.]
+ [0. 0. 0.]]​1로 채워진 배열 생성PythonCopyones_arr = np.ones((3, 2)) # 3x2 크기의 배열
+print(ones_arr)
+
+​출력 결과Plain TextCopy[[1. 1.]
+ [1. 1.]
+ [1. 1.]]​특정 값으로 채워진 배열 생성PythonCopyfull_arr = np.full((2, 2), 7) # 2x2 크기의 7로 채워진 배열
+print(full_arr)
+
+​출력 결과Plain TextCopy[[7 7]
+ [7 7]]
+
+​연속적인 값으로 채워진 배열 생성:PythonCopyrange_arr = np.arange(10) # 0부터 9까지의 연속된 값
+print(range_arr)
+
+​출력 결과Plain TextCopy[0 1 2 3 4 5 6 7 8 9]
+
+​NumPy 배열의 기초 연산 📚NumPy 배열에서는 반복문 없이 벡터화 연산을 통해 쉽게 연산을 수행할 수 있습니다.기본 연산덧셈, 뺄셈, 곱셈, 나눗셈 모두 가능합니다.PythonCopyarr = np.array([1, 2, 3, 4, 5])
+# 각 원소에 2를 더하기
+arr_add = arr + 2
+print(arr_add)
+# 각 원소에 2를 곱하기
+arr_mul = arr * 2
+print(arr_mul)
+
+​출력 결과Plain TextCopy[3 4 5 6 7]
+[ 2  4  6  8 10]
+
+​배열 간의 연산배열 간의 덧셈과 곱셈도 쉽습니다.PythonCopyarr1 = np.array([1, 2, 3])
+arr2 = np.array([4, 5, 6])
+# 배열 간 덧셈
+arr_sum = arr1 + arr2
+print(arr_sum)
+# 배열 간 곱셈
+arr_mul = arr1 * arr2
+print(arr_mul)
+
+​출력 결과Plain TextCopy[5 7 9]
+[ 4 10 18]
+
+​배열의 인덱싱과 슬라이싱인덱싱(Indexing)배열의 특정 위치에 접근하는 방법입니다.PythonCopyarr = np.array([10, 20, 30, 40, 50])
+# 첫 번째 원소
+print(arr[0])
+# 마지막 원소
+print(arr[-1])
+
+​출력 결과Plain TextCopy10
+50
+
+​슬라이싱(Slicing)배열의 일부분을 잘라내는 방법입니다.PythonCopyarr = np.array([10, 20, 30, 40, 50])
+# 두 번째부터 네 번째 원소까지
+sliced_arr = arr[1:4]
+print(sliced_arr)
+
+​출력 결과Plain TextCopy[20 30 40]
+
+​다차원 배열의 인덱싱 및 슬라이싱다차원 배열의 경우, 콤마를 사용해 접근합니다.PythonCopyarr2d = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+# 특정 원소 접근 (2행 3열)
+print(arr2d[1, 2])
+# 슬라이싱 (2행까지, 2열까지)
+sliced_arr2d = arr2d[:2, :2]
+print(sliced_arr2d)
+
+​출력 결과Plain TextCopy6
+[[1 2]
+ [4 5]]
+
+​요약📚요약NumPy 배열은 리스트보다 강력한 기능을 제공하며, 다양한 방법으로 생성할 수 있습니다.배열 간의 벡터화 연산을 통해 복잡한 수학 연산을 쉽게 수행할 수 있습니다.인덱싱과 슬라이싱을 사용해 배열의 특정 원소나 부분 배열에 쉽게 접근 가능합니다.이제 NumPy 배열을 자유자재로 다뤄보세요! 😊Son minsuckSep 25토글 리스트로 변환

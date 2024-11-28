@@ -1,0 +1,50 @@
+Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩📕 LLM & RAG를 활용한 AI 서비스 만들기/📘 LLM & RAG를 활용한 AI 서비스 만들기 - 5주차/📕Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩Made with📕Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩수업 목표한국어 임베딩의 특징과 임베딩 실습을 진행합니다.목차Word2Vec을 사용한 한국어 임베딩Word2Vec 한국어 임베딩 실습Sentence-Transformer로 한국어 문장 임베딩Sentence-Transformer 한국어 임베딩 실습Transformer 기반 최신 한국어 임베딩Transformer 한국어 임베딩 실습: KoBERT 사용한국어 임베딩의 특징과 도전 과제왜 한국어 임베딩이 어려운가?최신 모델과 접근 방식배운 내용 정리하기!❗이번 실습에서는 한국어 임베딩을 위한 세 가지 대표적인 기법인 Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩을 살펴보고 실습해볼 거예요. 특히 최신 Transformer 모델을 사용하여 한국어를 잘 처리하는 방법에 대해 알아볼게요.Word2Vec을 사용한 한국어 임베딩❗Word2Vec은 단어를 고차원 벡터로 변환하여 의미적 유사성을 측정하는 임베딩 기법이에요. 단어 간의 문맥적 관계를 반영하여, 비슷한 의미를 가진 단어들이 유사한 벡터 값을 갖도록 학습합니다.Word2Vec 한국어 임베딩 실습PythonCopyfrom gensim.models import Word2Vec
+
+# 샘플 한국어 문장 데이터
+sentences = [
+"나는 오늘 책을 읽었다",
+"고양이가 야옹하고 울었다",
+"인공지능은 정말 흥미로운 주제다",
+"한국어 임베딩을 학습하는 중이다"
+]
+# Python 기본 split() 사용해 간단하게 토큰화
+tokenized_sentences = [sentence.split() for sentence in sentences]
+# Word2Vec 모델 학습
+word2vec_model = Word2Vec(sentences=tokenized_sentences, vector_size=100, window=5, min_count=1, workers=4)
+# 단어 '고양이'와 유사한 단어 찾기
+similar_words = word2vec_model.wv.most_similar("고양이")
+print(similar_words)
+
+​Word2Vec 특징장점: 단어 간의 의미적 관계를 파악하는 데 적합단점: 단어 자체만 학습하므로, 문장 단위에서는 유연성이 부족Sentence-Transformer로 한국어 문장 임베딩💡Sentence-Transformer는 문장 단위로 임베딩을 생성할 수 있는 BERT 기반의 모델이에요. 특히 한국어에 특화된 Ko-Sentence-BERT 같은 모델을 사용하면, 문장 간의 의미적 유사성을 정확하게 계산할 수 있습니다.Sentence-Transformer 한국어 임베딩 실습PythonCopyfrom sentence_transformers import SentenceTransformer
+
+# 최신 Ko-Sentence-BERT 모델 로드
+model = SentenceTransformer('sentence-transformers/kr-sentence_bert-base')
+# 샘플 문장들
+sentences = [
+"나는 오늘 책을 읽었다.",
+"고양이가 야옹하고 울었다.",
+"인공지능은 흥미로운 주제다.",
+"한국어 임베딩을 학습하는 중이다."
+]
+# 문장 임베딩 생성
+embeddings = model.encode(sentences)
+# 첫 번째 문장 임베딩 확인
+print(embeddings[0])
+
+​Sentence-Transformer 특징장점: 문장 간의 유사성을 정확하게 측정, 문맥을 고려한 임베딩 생성단점: 학습 속도가 상대적으로 느림Transformer 기반 최신 한국어 임베딩💡Transformer 기반 모델들은 BERT, GPT 같은 모델들로 발전해왔고, 최근에는 KoBERT, KoGPT와 같은 한국어 특화 모델이 등장했어요. 이 모델들은 문맥을 고려하여 정교한 임베딩을 생성해줍니다.Transformer 한국어 임베딩 실습: KoBERT 사용PythonCopyfrom transformers import BertTokenizer, BertModel
+import torch
+
+# KLUE-BERT 모델과 토크나이저 로드
+tokenizer = BertTokenizer.from_pretrained('klue/bert-base')
+model = BertModel.from_pretrained('klue/bert-base')
+# 입력 문장
+sentence = "한국어 임베딩을 학습하고 있습니다."
+# 토큰화 및 텐서 변환
+inputs = tokenizer(sentence, return_tensors='pt')
+# 임베딩 생성
+with torch.no_grad():
+    outputs = model(**inputs)
+# 임베딩 벡터 추출 (평균값으로 계산)
+embedding = outputs.last_hidden_state.mean(dim=1)
+print(embedding)
+​Transformer 특징장점: 문맥을 양방향으로 이해, 문장 전체의 의미를 깊이 반영단점: 계산 비용이 크고, 모델 크기가 큼한국어 임베딩의 특징과 도전 과제왜 한국어 임베딩이 어려운가?1️⃣교착어 특성: 한국어는 조사와 어미를 많이 사용하는 교착어로, 단어 변형이 많아 정확한 형태소 분석이 중요해요.2️⃣어순의 유연성: 한국어는 어순이 자유롭기 때문에, 동일한 의미라도 다양한 형태로 표현될 수 있어요.3️⃣데이터 부족: 영어에 비해 한국어로 학습된 데이터가 상대적으로 적어, 임베딩 모델이 충분히 학습되지 않은 경우가 많습니다.최신 모델과 접근 방식KoBERT, KoGPT 등 한국어 전용 Transformer 모델들은 이러한 문제를 해결하기 위해 한국어에 특화된 데이터셋을 사용하여 학습되었습니다.특히 Sentence-Transformer는 문장 간 의미적 유사성을 정확하게 파악하는 데 강점을 가지며, 한국어 문장 처리에 탁월한 성능을 보여줍니다.배운 내용 정리하기!요약Word2Vec: 단어 단위의 의미적 유사성을 벡터로 표현.Sentence-Transformer: 문장 간 유사성을 벡터로 표현, Ko-Sentence-BERT 모델로 한국어 문장 처리.Transformer 모델 (특히? KoBERT): 문맥을 고려한 고차원 임베딩, 한국어 전용 모델로 강력한 성능.😀이러한 다양한 임베딩 기법을 통해 한국어 텍스트 분석의 정확성과 효율성을 높일 수 있습니다. 한국어 임베딩의 특성과 최신 기법을 잘 활용하여 LLM 시스템에 적용해보세요!
