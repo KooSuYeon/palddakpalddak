@@ -31,10 +31,36 @@ st.markdown(
 st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow_html=True)
 
 # 사이드바 구성하기
-st.sidebar.header('목차 선택')
-theme = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'AI 활용'])
+st.sidebar.header('주제 선택')
+
+# 라디오 버튼으로 큰 주제 선택
+option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'AI 활용'])
+if option == '파이썬 라이브러리':
+    theme = st.sidebar.selectbox('어떤 교재를 선택할까요?', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM & RAG', 'AI 활용'])
+    st.write(f'{theme}')
+
+elif option == '머신러닝':
+    theme = st.sidebar.selectbox('어떤 교재를 선택할까요?', ['파이썬', '머신러닝', '딥러닝', 'LLM, RAG'])
+    st.write(f'{theme}')
+
+elif option == '딥러닝':
+    theme = st.sidebar.selectbox(
+        '어떤 교재를 선택할까요?',
+        ['1. 딥러닝 개념을 잡아봅시다!', '2. 신경망의 기본 원리', '딥러닝을 배워야 하는 이유',
+        '퍼셉트론과 다층 퍼셉트론(XOR 문제 포함)', '다층 퍼셉트론(MLP)', '활성화 함수', '손실 함수와 최적화 알고리즘', '역전파에 대해 알아볼까요?',
+        'conda를 이용한 환경 설정', 'jupyter notebook', '가상환경 설치 및 jupyter notebook 연결', 'pytorch 설치​환경 활성화', 
+        '기본 구조와 동작원리'])
+    
+
+    theme = st.sidebar.selectbox(
+        '어떤 교재를 선택할까요?',
+        ['딥러닝이란 무엇일까요?', '딥러닝의 역사와 활용 방안', '딥러닝을 배워야 하는 이유',
+        '퍼셉트론과 다층 퍼셉트론(XOR 문제 포함)', '다층 퍼셉트론(MLP)', '활성화 함수', '손실 함수와 최적화 알고리즘', '역전파에 대해 알아볼까요?',
+        'conda를 이용한 환경 설정', 'jupyter notebook', '가상환경 설치 및 jupyter notebook 연결', 'pytorch 설치​환경 활성화', 
+        '기본 구조와 동작원리'])
+    st.write(f'{theme}')
+
 st.sidebar.header('대화 내역')
-st.write(f'{theme}에 대한 퀴즈를 내보겠습니다!')
 
 # .env 파일에서 api 키 가져오기
 API_KEY = os.getenv('openai_api_key')
@@ -57,12 +83,19 @@ except FileNotFoundError:
 
 
 
+# CSV 파일이 존재하지 않으면 빈 DataFrame 생성
+if os.path.exists(CSV_FILE):
+    chat_history_df = pd.read_csv(CSV_FILE)
+else:
+    chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
+
 # 새 대화 세션 시작
 def start_chat_session():
     return []
 
 if "chat_session" not in st.session_state:
     st.session_state["chat_session"] = start_chat_session()
+    st.session_state["current_chat_id"] = str(uuid.uuid4())[:8]  # 새 대화가 시작되면 새로운 ChatID 생성
 
 # 기존 채팅 기록 표시
 for content in st.session_state.chat_session:
@@ -90,7 +123,7 @@ if prompt := st.chat_input("메시지를 입력하세요."):
         st.session_state.chat_session.append({"role": "assistant", "content": reply})
 
     # 대화 내역을 CSV에 저장
-    chat_id = str(uuid.uuid4())[:8]  # 고유한 ChatID 생성
+    chat_id = st.session_state["current_chat_id"]
     new_rows = []
 
     for content in st.session_state.chat_session:
@@ -120,10 +153,14 @@ def get_button_label(chat_df, chat_id):
         return f"Chat {chat_id[0:7]}: No User message found"  # 메시지가 없으면 안내 문구 표시
 
 # 사이드바에 저장된 대화 기록을 표시
-for chat_id in chat_history_df["ChatID"].unique():
-    button_label = get_button_label(chat_history_df, chat_id)
-    if st.sidebar.button(button_label):
-        current_chat_id = chat_id
-        loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
-        loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
-        st.text_area("Chat History", value=loaded_chat_string, height=300)
+if len(chat_history_df) > 0:
+    # 이미 버튼이 만들어져 있다면 대화 목록 표시
+    for chat_id in chat_history_df["ChatID"].unique():
+        button_label = get_button_label(chat_history_df, chat_id)
+        if st.sidebar.button(button_label):
+            current_chat_id = chat_id
+            loaded_chat = chat_history_df[chat_history_df["ChatID"] == chat_id]
+            loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
+            st.text_area("Chat History", value=loaded_chat_string, height=300)
+else:
+    st.sidebar.write("저장된 대화가 없습니다.")
