@@ -44,17 +44,6 @@ async def check_answer(request: AnswerRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-
-@app.get("/get_history{user_id}")
-async def get_history(user_id):
-    file_path = os.path.join(FILE_DIR, f"{user_id}.txt")
-    
-    if os.path.exists(file_path):
-        with open(file_path, "r", encoding="utf-8") as file:
-            content = file.read()
-        return content
-    else:
-        raise HTTPException(status_code=404, detail="File not found")
     
 
 # 대화 불러오기 api
