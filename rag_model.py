@@ -22,11 +22,11 @@ def get_llm(api_key:str):
     llm = ChatOpenAI(model="gpt-4o", api_key=api_key)
     return llm
 
-def load_files_to_list(file_path, text_list):
+def load_files_to_list(file_path):
     if os.path.exists(file_path):  
         with open(file_path, 'r', encoding='utf-8') as file:  
             content = file.read() 
-            text_list.append(content) 
+            return content
     else:
         print(f"File {file_path} not found.")
 
@@ -34,7 +34,9 @@ def save_docs_list(type_:str, length_:int, list_:list):
     file_paths = [f"dataset/{type_}_dataset_{i}.txt" for i in range(1, length_+1)]  # 파일 경로 목록 (DL_dataset_1.txt, DL_dataset_2.txt, ...)
 
     for j in range(len(file_paths)):
-        load_files_to_list(file_paths[j], list_)
+        content = load_files_to_list(file_paths[j])
+        if content:  # 파일이 성공적으로 로드된 경우만 추가
+            list_.append(content)
 
     print(f"{type_} 관련 {len(list_)} 개의 파일 저장 완료")
 
@@ -88,7 +90,7 @@ def save_file(txt:str, file_name:str):
     with open(file_name, 'w', encoding='utf-8') as content_file:
         content_file.write(txt)
 
-    print(f"TEXT 파일 저장 완료: {file_name}")
+    print(f"=========TEXT 파일 저장 완료: {file_name}===========")
 
 
 class DebugPassThrough(RunnablePassthrough):
@@ -118,13 +120,14 @@ def choose_txt_list(type_:str):
         return save_docs_list("PYTHON", 16, txt_list)
     if type_ == "open_source":
         return save_docs_list("OPENSOURCE", 7, txt_list)
+    print(f"=========={type_}교재 불러오기 완료========")
     
 
 
 concept_prompt = ChatPromptTemplate.from_messages([
     ("system", """
     당신은 AI 강사입니다.
-    아래의 {context} 안에서만 반드시 **한국말**로 된 하나의 질문을 생성해주세요.
+    아래의 {context} 안에서만 반드시 **한국말**로 된 단, 하나의 질문을 생성해주세요.
     (최대한 코드에 관한 시나리오적 질문이면 더 좋습니다.)
     {quiz_list}에 존재하는 질문들과는 최대한 덜 유사한 질문을 생성해주세요.
     아래의 제약 조건과 출제 방식에 맞춘 질문을 생성해주세요.
@@ -254,15 +257,43 @@ def is_similar(new_quiz, quiz_list, threshold=0.8):
     return any(sim >= threshold for sim in similarities[0])
 
 
-def get_question(type_:str, order:str):
+
+def get_session_no(id: str) -> int:
+
+    global j
+    j  = 1
+
+    # 현재 디렉토리에서 id가 포함된 모든 txt 파일 검색
+    txt_files = [f for f in os.listdir('.') if f.startswith(id) and f.endswith('.txt')]
+
+    # session_no를 저장할 리스트
+    session_numbers = []
+
+    # 파일 이름에서 session_no 추출
+    for file in txt_files:
+        try:
+            parts = file.split('_')
+            if len(parts) > 1:
+                session_no = int(parts[1])  # 두 번째 요소를 session_no로 해석
+                session_numbers.append(session_no)
+        except ValueError:
+            # session_no가 숫자가 아닌 경우 무시
+            continue
+
+    # session_no 리스트가 비어 있다면 0 반환, 그렇지 않으면 최대값 반환
+    return max(session_numbers) if session_numbers else 0
+
+
+
+def get_question(session_no:int, id:str, type_:str,  order:str):
 
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
     global quiz_list
-    print(current_index)
-    print(*quiz_list)
+    global j
+    
 
     quiz_list = quiz_list[-5:]  # 최신 5개 퀴즈만 보관
     txt_list = choose_txt_list(type_)
@@ -292,20 +323,23 @@ def get_question(type_:str, order:str):
             break
 
     if (type_=="open_source"):
-        discription = get_discription(response, type_, order, get_llm(api_key), api_key)
+        discription = get_discription(response, type_, order)
         question = ''.join([discription.content, str(response)])
-        return question
+    else:
+        question = response
     
+    save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{j}.txt")
+
     return ''.join(response)
 
-def get_feedback(quiz:str, user_answer:str):
+def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str):
 
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
-    print(current_index)
-    print(*quiz_list)
+    global j
+    
 
     feedback_prompt = ChatPromptTemplate.from_messages([
             ("system", f"""
@@ -325,6 +359,9 @@ def get_feedback(quiz:str, user_answer:str):
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
     current_index += 5
 
+    save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{j}.txt")
+    save_file(''.join(feedback.content), f"{id}_{session_no}_{type_}_{order}_feedback_{j}.txt")
+    j += 1
     return feedback.content
 
 
@@ -340,41 +377,6 @@ def get_discription(quiz, type_, order):
     discription = discription_chain.invoke({"quiz": quiz, "context": retriever})
 
     return discription
-
-# def run_rag_chatbot(type_, order, user_):
-
-#     global j
-#     global quiz_list
-
-#     load_dotenv()
-#     api_key = os.getenv("OPEN_AI_KEY")
-
-#     question = ""
-
-#     quiz = get_question(type_, order, api_key)
-#     quiz_list.append(quiz)
-#     j+=1
-#     save_file(''.join(question), f"quiz_list_{j}.txt")
-        
-#     # 2. 사용자 답변 수집
-#     user_answer = input("답변을 입력하세요 종료를 원하시면 exit을 입력해주세요.: ").strip()
-    
-
-#     if user_answer.strip().lower() == "exit":
-#         print("=========== 대화를 종료합니다.")
-#         return 
-            
-        
-#     if not user_answer:
-#         print("=============== 답변이 비어 있습니다. 다시 입력해주세요.")
-#         return 
-    
-#     save_file(''.join(user_answer), f"answer_list_{j}.txt")
-
-#     feedback = get_feedback(quiz, user_answer, api_key)
-#     save_file(''.join(str(feedback.content)), f"feedback_list_{j}.txt")
-    
-
         
 
 if __name__ == '__main__':
@@ -385,5 +387,5 @@ if __name__ == '__main__':
 
     quiz_list = []
     current_index = 0
-    j = 0
+    j = 1
     valid_type = ["dl", "ml", "llm", "python", "open_source"]
