@@ -8,12 +8,12 @@ import logging
 # FastAPI 애플리케이션 생성
 app = FastAPI()
 
-# CORS 허용 (필요한 경우)
+# CORS 허용
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # 보안상 필요한 도메인만 추가
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST"], #GET, POST 로 메서드 제한
     allow_headers=["*"],
 )
 
