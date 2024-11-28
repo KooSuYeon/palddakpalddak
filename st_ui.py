@@ -31,7 +31,10 @@ st.markdown(
 st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow_html=True)
 
 # 사이드바 구성하기
+st.sidebar.header('목차 선택')
+theme = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'AI 활용'])
 st.sidebar.header('대화 내역')
+st.write(f'{theme}에 대한 퀴즈를 내보겠습니다!')
 
 # .env 파일에서 api 키 가져오기
 API_KEY = os.getenv('openai_api_key')
@@ -52,9 +55,9 @@ try:
 except FileNotFoundError:
     chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
 
+
+
 # 새 대화 세션 시작
-# @st.cache_data  # 새로고침하면 대화 내역이 사라짐
-@st.cache_resource  # 새로고침해도 대화 내역이 남아있음
 def start_chat_session():
     return []
 
@@ -112,7 +115,7 @@ def get_button_label(chat_df, chat_id):
     user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")]
     if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
         last_user_message = user_messages.iloc[-1]["Content"]
-        return f"Chat {chat_id[0:3]}: {' '.join(last_user_message.split()[:5])}..."  # 마지막 메시지의 첫 5단어를 표시
+        return f"Chat {chat_id[0:7]}: {' '.join(last_user_message.split()[:5])}..."  # 마지막 메시지의 첫 5단어를 표시
     else:
         return f"Chat {chat_id[0:7]}: No User message found"  # 메시지가 없으면 안내 문구 표시
 
