@@ -86,7 +86,6 @@ st.markdown(
 )
 st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow_html=True)
 
-<<<<<<< HEAD
 # 교재별 매핑 데이터
 mapping_data = {
     "파이썬 라이브러리": {
@@ -180,11 +179,8 @@ mapping_data = {
     }
 }
 
-=======
-
 # 사이드바 구성하기
 st.sidebar.header('목차 선택')
->>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 
 ###############################################################
 ################### 주제별 매핑값 반환 ########################
@@ -207,11 +203,7 @@ def update_api_on_select():
     else:
         st.error("API 호출 실패: Server code error.")
 
-<<<<<<< HEAD
 #################### 사이드바 구성 ############################
-=======
-# 사이드바 구성
->>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 st.sidebar.header('목차 선택')
 theme = st.sidebar.selectbox(
     '주제를 선택하세요.',
@@ -219,7 +211,7 @@ theme = st.sidebar.selectbox(
     key="selected_theme",  # 상태 저장 키
     on_change=update_api_on_select  # 값 변경 시 콜백 호출
 )
-<<<<<<< HEAD
+
 if theme == '파이썬 라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
@@ -269,8 +261,6 @@ elif theme == 'OPENSOURCE':
                                     '무더위 쉼터 데이터'])
     st.write(f'{theme}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
-=======
->>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 st.sidebar.header('대화 내역')
 
 ###############################################################
@@ -289,10 +279,6 @@ except requests.exceptions.RequestException as e:
     logging.error(f"Error making API request: {e}")
     st.error(f"API 호출 실패: {e}")
 
-
-
-
-
 ####################### 대화 시작 ###########################
 
 # 새 대화 세션 시작
@@ -306,8 +292,6 @@ if "chat_session" not in st.session_state:
 for content in st.session_state.chat_session:
     with st.chat_message("ai" if content["role"] == "assistant" else "user"):
         st.markdown(content["content"])
-
-
 
 ################### 사용자 입력 ###############################
 if user_answer := st.chat_input("답변을 입력하세요."):
