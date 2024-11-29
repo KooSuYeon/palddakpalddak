@@ -12,3 +12,6 @@ uvicorn
 langchain-openai
 langchain-community
 faiss-cpu
+
+requests 
+pydub
