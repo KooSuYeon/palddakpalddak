@@ -56,7 +56,7 @@ except FileNotFoundError:
 ########### session_state 전역변수 초기값 설정 #############
 
 if "selected_theme" not in st.session_state:
-    st.session_state.selected_theme = '파이썬 라이브러리'
+    st.session_state.selected_theme = '파이썬_라이브러리'
 if 'type_' not in st.session_state:
     st.session_state.type_ = 'python'
 if 'user_id' not in st.session_state:
@@ -88,7 +88,7 @@ st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow
 
 # 교재별 매핑 데이터
 mapping_data = {
-    "파이썬 라이브러리": {
+    "파이썬_라이브러리": {
         'Pandas 설치 및 Jupyter Notebook 설정하기': 1,
         'NumPy 소개 및 설치': 2,
         'NumPy 배열(array) 생성 및 기초 연산': 3,
@@ -148,7 +148,7 @@ mapping_data = {
         '하이퍼파라미터 튜닝': 15,
         '모델 평가와 검증 및 Pytorch 문법 정리': 16
     },
-    "LLM, RAG": {
+    "LLM/RAG": {
         'LLM이란? 강의소개!': 1,
         'LLM 시스템 형성을 위한 다양한 기법 및 요소 개념 익히기': 2,
         'OpenAI Playground 사용법 가이드': 3,
@@ -187,18 +187,11 @@ st.sidebar.header('목차 선택')
 ###############################################################
 # 주제 매핑
 theme_to_type = {
-    '파이썬 라이브러리': 'python',
+    '파이썬_라이브러리': 'python',
     '머신러닝': 'ml',
     '딥러닝': 'dl',
-    'LLM/RAG': 'llm',
-    'AI 활용': 'open_source'
-}
-
-# 언어 매핑
-language_mapping = {
-    '한국어': 'KO',
-    '영어': 'EN',
-    '일본어': 'JA'
+    'LLM_RAG': 'llm',
+    'OPENSOURCE': 'open_source'
 }
 
 # 콜백 함수 정의
@@ -220,7 +213,7 @@ theme = st.sidebar.selectbox(
     on_change=update_api_on_select  # 값 변경 시 콜백 호출
 )
 
-if theme == '파이썬 라이브러리':
+if theme == '파이썬_라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
                                 'NumPy 소개 및 설치', 'NumPy 배열(array) 생성 및 기초 연산', '배열 연산 및 브로드캐스팅',
@@ -249,7 +242,7 @@ elif theme == '딥러닝':
                                 '과적합 방지 기법', '하이퍼파라미터 튜닝', '모델 평가와 검증 및 Pytorch 문법 정리'])
     st.write(f'{theme}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
-elif theme == 'LLM & RAG':
+elif theme == 'LLM_RAG':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['LLM이란? 강의소개!', 'LLM 시스템 형성을 위한 다양한 기법 및 요소 개념 익히기', 'OpenAI Playground 사용법 가이드',
                                 '프롬프트 엔지니어링 개념잡기!', '프롬프트 엔지니어링 맛보기', '프롬프트 엔지니어링의 기본 원칙',
