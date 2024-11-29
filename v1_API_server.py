@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
-from rag_model import get_feedback, get_session_no, get_question_language  # rag_model.py 파일을 임포트
+from rag_model import get_feedback, get_session_no, get_question_language, read_quiz_from_file  # rag_model.py 파일을 임포트
 from fastapi.responses import JSONResponse
 import os
 import glob
@@ -30,24 +30,22 @@ global user_id
 global session_no
 global type_
 global order
-global quiz
 global quiz_list
 global current_index
-global rag_output_path
 global language
 
 
 user_id: str = "sj5black"
-session_no: int = get_session_no(user_id)
+session_no: int = get_session_no(user_id) + 1
 type_: str = "python"
 order: int = 1
-rag_output_path: str = "./rag_model_output"
 current_index: int = 0
 language: str = "한국어"
 
 # FastAPI 애플리케이션 생성
 app = FastAPI()
 FILE_DIR = "./text_files"
+RAG_OUTPUT = "./rag_model_output"
 
 # CORS
 app.add_middleware(
@@ -125,7 +123,7 @@ async def generate_quiz(request: QuizRequest):
     #     raise HTTPException(status_code=400, detail="선택된 주제와 AI가 생성한 topic이 일치하지 않았습니다.")
     try:
         logger.info(f"Generating quiz for topic: {request.topic}")
-        quiz = get_question_language(session_no, user_id, request.topic, order, language, rag_output_path, current_index)
+        quiz = get_question_language(session_no, user_id, request.topic, order, language, RAG_OUTPUT, current_index)
         return {"퀴즈": quiz}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
@@ -137,9 +135,12 @@ async def generate_quiz(request: QuizRequest):
 # 답변 검토 엔드포인트
 @app.post("/check_answer")
 async def check_answer(request: AnswerRequest):
+
+    quiz = read_quiz_from_file(RAG_OUTPUT, "quiz", user_id, session_no, type_, order)
+    logger.info(f"QUIZ : {quiz}")
     try:
         logger.info(f"Checking answer for context {request.user_answer}")
-        feedback = get_feedback(session_no, user_id, type_, order, quiz, request.user_answer, current_index)
+        feedback = get_feedback(session_no, user_id, type_, order, quiz, request.user_answer, language, RAG_OUTPUT)
         return {"피드백": feedback}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")

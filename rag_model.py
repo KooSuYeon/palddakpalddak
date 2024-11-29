@@ -55,9 +55,11 @@ def get_retriever(texts: str, current_index:int, api_key=str):
 
     splits_recur = recursive_text_splitter.split_documents(documents)
     total_chunks = len(splits_recur)
+
+    current_index %= total_chunks
     # 다음 인덱스 계산
     next_index = current_index + 10
-    if next_index > total_chunks:  # 초과 시 순환 처리
+    if next_index >= total_chunks:  # 초과 시 순환 처리
         selected_splits = splits_recur[current_index:] + splits_recur[:next_index % total_chunks]
     else:
         selected_splits = splits_recur[current_index:next_index]
@@ -405,15 +407,15 @@ def get_current_index(session_no: int, id: str, type_: str, order: int, base_pat
 
 
 def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str, rag_output_path:str, current_index:int):
+    
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
 
     current_index = get_current_index(session_no, id, type_, order, rag_output_path)
     quiz_list = get_quiz_files_by_id_type_order_and_session("./rag_model_output", session_no, id, type_, order)
     # print(*quiz_list)
     txt_list = choose_txt_list(type_)
     file_number = get_next_index(rag_output_path,"quiz", id, session_no, type_, order)
-
 
     retriever = get_retriever(txt_list[order-1], current_index, api_key)
     if type_ == "open_source":
@@ -428,7 +430,7 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
     
     response = rag_chain.invoke("퀴즈 하나를 생성해줘")
 
-    while True:  # 유사하지 않은 퀴즈가 생성될 때까지 반복
+    for _ in range(10):  # 유사하지 않은 퀴즈가 생성될 때까지 반복
         query = concept_prompt.format(
             context=retriever,
             quiz_list=quiz_list,
@@ -450,7 +452,7 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
     if (id != ""):
         save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
-    return ''.join(response)
+    return ''.join(question)
 
 ###############################################################
 ######################## AI 피드백 ############################
@@ -459,7 +461,7 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
 def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str, rag_output_path:str):
 
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
 
     global current_index
     user_file_number = get_next_index(rag_output_path,"user", id, session_no, type_, order)
@@ -493,11 +495,37 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     
     return feedback
 
+def read_quiz_from_file(directory: str, category: str, id: str, session_no: int, type_: str, order: str) -> str:
+    """
+    특정 id, session_no, type_, order에 해당하는 quiz 파일을 읽어서 내용을 반환합니다.
+    
+    :param directory: 파일을 검색할 디렉토리 경로
+    :param id: 파일을 찾을 id 값
+    :param session_no: 세션 번호
+    :param type_: 타입 값
+    :param order: 순서 값
+    :return: 파일에서 읽은 퀴즈 내용 (텍스트)
+    """
+    # 파일 인덱스를 자동으로 찾기
+    file_number = get_next_index(directory, category, id, session_no, type_, order)
+    
+    # 파일 경로 구성
+    file_name = f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt"
+    file_path = os.path.join(directory, file_name)
+    
+    # 파일이 존재하는지 확인 후 읽기
+    if os.path.exists(file_path):
+        with open(file_path, 'r', encoding='utf-8') as file:
+            quiz_content = file.read()  # 파일 내용 읽기
+        return quiz_content
+    else:
+        raise FileNotFoundError(f"{file_path} 파일을 찾을 수 없습니다.")
+
 
 def get_translation(content:str, language:str):
     
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
 
     translation_chain = translation_prompt | get_llm(api_key)
     translation = translation_chain.invoke({"content": content, "language": language})
@@ -508,7 +536,7 @@ def get_translation(content:str, language:str):
 def get_discription(quiz, type_, order):
 
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
 
     discription_chain = discription_prompt | get_llm(api_key)
     txt_list = choose_txt_list(type_)
