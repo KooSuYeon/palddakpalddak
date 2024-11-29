@@ -336,7 +336,8 @@ def get_next_index(directory: str, category:str, id: str, session_no: int, type_
 ###############################################################
 ################ AI 퀴즈 (세션 의존성 기억) ########################
 ###############################################################
-def get_question(session_no:int, id:str, type_:str,  order:str):
+def get_question(session_no:int, id:str, type_:str,  order:int):
+    
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
@@ -411,7 +412,7 @@ def get_quiz_files_by_id_and_type(directory: str, id: str, type_: str) -> List[s
 ###############################################################
 
 
-def get_question_language(session_no:int, id:str, type_:str,  order:str, language:str):
+def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str):
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
