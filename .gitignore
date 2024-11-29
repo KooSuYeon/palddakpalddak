@@ -3,4 +3,5 @@ __pycache__
 
 venv
 API_server.log
+Client_UI.log
 api.http

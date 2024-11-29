@@ -16,3 +16,4 @@ faiss-cpu
 
 requests 
 pydub
+streamlit
