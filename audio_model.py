@@ -15,9 +15,9 @@ AudioSegment.ffprobe = which("ffprobe")
 output_filename = "output_audio.mp3"
 
 def generate_audio_from_text(text):
-
+    voice_id = "21m00Tcm4TlvDq8ikWAM"
     # API URL과 API 키를 설정합니다.
-    url = os.getenv("ELEVENLABS_MODEL_URL")
+    url = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
     api_key = os.getenv("ELEVENLABS_API_KEY")
 
     headers = {
@@ -28,7 +28,6 @@ def generate_audio_from_text(text):
     data = {
         "text": text,
         "model_id": "eleven_multilingual_v2",
-        # "voice_id": voice_id, 
         "voice_settings": {
             "stability": 0.6,
             "similarity_boost": 1,
