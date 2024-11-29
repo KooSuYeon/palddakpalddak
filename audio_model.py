@@ -8,12 +8,18 @@ from pydub.utils import which
 
 load_dotenv()
 
+# 세팅
 AudioSegment.converter = which("ffmpeg")
 AudioSegment.ffprobe = which("ffprobe")
 
 output_filename = "output_audio.mp3"
 
-def generate_audio_from_text(text, api_key, url):
+def generate_audio_from_text(text):
+
+    # API URL과 API 키를 설정합니다.
+    url = os.getenv("ELEVENLABS_MODEL_URL")
+    api_key = os.getenv("ELEVENLABS_API_KEY")
+
     headers = {
         "xi-api-key": api_key,
         "Content-Type": "application/json"
@@ -58,13 +64,9 @@ if __name__ == "__main__":
     text1 = "로마는 1승 3무 1패(승점 6)로 21위에 자리했다. 올 시즌부터 UEL은 챔피언스리그(UCL)와 동일하게 본선 무대에 오른 36개 팀이 리그 페이즈에서 8경기(홈 4경기·원정 4경기)씩 치른다. 이후 상위 1~8위 팀은 16강에 직행하고, 9위에서 24위 팀은 플레이오프를 벌여 승자가 16강에 합류한다."
     text2= "Son Heung-min (Tottenham Hotspur) scored his fourth goal in the 2024-2025 UEFA Europa League (UEL). He scored his first goal in this season's European match and rejoiced with a click ceremony."
 
-    # API URL과 API 키를 설정합니다.
-    url = os.getenv("ELEVENLABS_MODEL_URL")
-    api_key = os.getenv("ELEVENLABS_API_KEY")
-
     
     # 음성을 생성하고 저장 및 재생합니다.
-    audio_content = generate_audio_from_text(text1, api_key, url)
+    audio_content = generate_audio_from_text(text1)
 
     if audio_content:
         play_audio(audio_content)
