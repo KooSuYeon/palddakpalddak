@@ -213,4 +213,4 @@ async def generate_audio_endpoint(text_request: TextRequest):
 
 # 메인 함수
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8004)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
