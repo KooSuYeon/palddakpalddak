@@ -191,9 +191,9 @@ async def generate_audio_endpoint(text_request: TextRequest):
         audio_segment = AudioSegment.from_mp3(io.BytesIO(audio_content))
 
         # api가 잘 작동하는지 보기위한 저장
-        output_filename = "generated_audio.mp3"
-        audio_segment.export(output_filename, format="mp3")
-        print(f"Audio saved as {output_filename}")
+        # output_filename = "generated_audio.mp3"
+        # audio_segment.export(output_filename, format="mp3")
+        # print(f"Audio saved as {output_filename}")
 
         audio_io = io.BytesIO()
         audio_segment.export(audio_io, format="mp3")
