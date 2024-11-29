@@ -185,12 +185,20 @@ st.sidebar.header('목차 선택')
 ###############################################################
 ################### 주제별 매핑값 반환 ########################
 ###############################################################
+# 주제 매핑
 theme_to_type = {
     '파이썬 라이브러리': 'python',
     '머신러닝': 'ml',
     '딥러닝': 'dl',
     'LLM/RAG': 'llm',
     'AI 활용': 'open_source'
+}
+
+# 언어 매핑
+language_mapping = {
+    '한국어': 'KO',
+    '영어': 'EN',
+    '일본어': 'JA'
 }
 
 # 콜백 함수 정의
@@ -260,6 +268,19 @@ elif theme == 'OPENSOURCE':
                                     '서울시 공공 자전거 분석',
                                     '무더위 쉼터 데이터'])
     st.write(f'{theme}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
+
+# 언어 선택
+language = ["한국어", "영어", "일본어"]
+selection = st.sidebar.segmented_control(
+    "언어", language, selection_mode="single", default="한국어"
+)
+st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
+
+# 녹음 기능
+audio_value = st.sidebar.audio_input("녹음해주세요.")
+
+if audio_value:
+    st.sidebar.audio(audio_value)
 
 st.sidebar.header('대화 내역')
 
