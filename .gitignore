@@ -1,14 +1,2 @@
-dataset_spartanotion.py
-RAG
-api.http
-# 가상환경 활성화 코드
-# RAG\Scripts\activate
-
-requirements.txt
-# pip install -r requirements.txt ; requirements.txt 파일에 있는 모든 패키지 설치
-# pip freeze > requirements.txt # 현재 설치된 패키지들 목록 만들어서
-# pip uninstall -r requirements.txt -y  # 모두 제거하기
-# pip uninstall 패키지 # 패키지 하나씩 지우기
-AI_boot
 .env
-
+__pycache__
