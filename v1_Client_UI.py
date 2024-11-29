@@ -204,7 +204,6 @@ def update_api_on_select():
         st.error("API 호출 실패: Server code error.")
 
 #################### 사이드바 구성 ############################
-# 사이드바 구성
 st.sidebar.header('목차 선택')
 theme = st.sidebar.selectbox(
     '주제를 선택하세요.',
@@ -212,6 +211,7 @@ theme = st.sidebar.selectbox(
     key="selected_theme",  # 상태 저장 키
     on_change=update_api_on_select  # 값 변경 시 콜백 호출
 )
+
 if theme == '파이썬 라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
@@ -279,10 +279,6 @@ except requests.exceptions.RequestException as e:
     logging.error(f"Error making API request: {e}")
     st.error(f"API 호출 실패: {e}")
 
-
-
-
-
 ####################### 대화 시작 ###########################
 
 # 새 대화 세션 시작
@@ -296,8 +292,6 @@ if "chat_session" not in st.session_state:
 for content in st.session_state.chat_session:
     with st.chat_message("ai" if content["role"] == "assistant" else "user"):
         st.markdown(content["content"])
-
-
 
 ################### 사용자 입력 ###############################
 if user_answer := st.chat_input("답변을 입력하세요."):

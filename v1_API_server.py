@@ -2,16 +2,12 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 from rag_model import get_question, get_feedback, get_session_no  # rag_model.py 파일을 임포트
-
 from fastapi.responses import JSONResponse
 import os
 import glob
 import uvicorn
 import logging
 from datetime import datetime
-
-import uvicorn
-import logging
 
 ############ 로그 파일 생성 ######################
 logging.basicConfig(
@@ -131,7 +127,6 @@ async def check_answer(request: AnswerRequest):
     except Exception as e:
         logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error.")
-
 
 # 대화 불러오기 api
 @app.get("/get_history/{user_id}")
