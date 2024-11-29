@@ -33,32 +33,45 @@ st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow
 # 사이드바 구성하기
 st.sidebar.header('주제 선택')
 
-# 라디오 버튼으로 큰 주제 선택
-option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'AI 활용'])
+# selectbox로 주제 선택
+option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬', '머신러닝', '딥러닝', 'LLM & RAG'])
 if option == '파이썬 라이브러리':
-    theme = st.sidebar.selectbox('어떤 교재를 선택할까요?', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM & RAG', 'AI 활용'])
-    st.write(f'{theme}')
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
+                                ['Pandas 설치 및 Jupyter Notebook 설정하기',
+                                'NumPy 소개 및 설치', 'NumPy 배열(array) 생성 및 기초 연산', '배열 연산 및 브로드캐스팅',
+                                '판다스 사용을 위해 데이터를 불러오기와 저장하기', '불러온 데이터 미리보기 및 기본 정보 확인', '데이터를 선택하는 기본 방법', '조건부 필터링과 데이터 타입 변환',
+                                '데이터 변형해보기: 데이터 정렬과 병합', '데이터 변형해보기: 그룹화 및 집계, 피벗테이블',
+                                '데이터 전처리: 결측치 탐지와 다양한 처리 방법', '데이터 전처리: 이상치 탐지 및 처리', '데이터 전처리: 데이터 정규화와 표준화 (비선형 변환 포함)', '데이터 전처리: 인코딩 (Encoding)',
+                                '판다스 심화: 멀티 인덱스와 복합 인덱스'])
+    st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
 elif option == '머신러닝':
-    theme = st.sidebar.selectbox('어떤 교재를 선택할까요?', ['파이썬', '머신러닝', '딥러닝', 'LLM, RAG'])
-    st.write(f'{theme}')
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
+                                ['강의 소개', '머신러닝 개요와 구성요소', 'Anaconda 설치 및 라이브러리 소개', 'Jupyter Notebook 사용해보기',
+                                '데이터셋 불러오기', '데이터 전처리', '데이터 전처리 실습',
+                                '지도학습 : 회귀모델', '지도학습 : 분류모델 - 로지스틱 회귀', '지도학습 : 분류모델 - SVM', '지도학습 : 분류모델 - KNN', '지도학습 : 분류모델 - 나이브베이즈', '지도학습 : 분류모델 - 의사결정나무',
+                                '비지도학습 : 군집화모델 - k-means clustering', '비지도학습 : 군집화모델 - 계층적 군집화', '비지도학습 : 군집화모델 - DBSCAN', '비지도학습 : 차원축소 - PCA', '비지도학습 : 차원축소 - t-SNE', '비지도학습 : 차원축소 - LDA',
+                                '앙상블 학습 - 배깅과 부스팅', '앙상블 학습 - 랜덤 포레스트', '앙상블 학습 - 그래디언트 부스팅 머신 (GBM)', '앙상블 학습 - XGBoost'])
+    st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
 elif option == '딥러닝':
-    theme = st.sidebar.selectbox(
-        '어떤 교재를 선택할까요?',
-        ['1. 딥러닝 개념을 잡아봅시다!', '2. 신경망의 기본 원리', '딥러닝을 배워야 하는 이유',
-        '퍼셉트론과 다층 퍼셉트론(XOR 문제 포함)', '다층 퍼셉트론(MLP)', '활성화 함수', '손실 함수와 최적화 알고리즘', '역전파에 대해 알아볼까요?',
-        'conda를 이용한 환경 설정', 'jupyter notebook', '가상환경 설치 및 jupyter notebook 연결', 'pytorch 설치​환경 활성화', 
-        '기본 구조와 동작원리'])
-    
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
+                                ['딥러닝 개념을 잡아봅시다!', '신경망의 기본 원리', '딥러닝 실습 환경 구축',
+                                '인공 신경망(ANN)', '합성곱 신경망(CNN)', '순환 신경망(RNN)',
+                                '어텐션 (Attention) 메커니즘', '자연어 처리(NLP) 모델',
+                                'ResNet', '이미지 처리 모델',
+                                '오토인코더', '생성형 모델', '전이학습',
+                                '과적합 방지 기법', '하이퍼파라미터 튜닝', '모델 평가와 검증 및 Pytorch 문법 정리'])
+    st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
-    theme = st.sidebar.selectbox(
-        '어떤 교재를 선택할까요?',
-        ['딥러닝이란 무엇일까요?', '딥러닝의 역사와 활용 방안', '딥러닝을 배워야 하는 이유',
-        '퍼셉트론과 다층 퍼셉트론(XOR 문제 포함)', '다층 퍼셉트론(MLP)', '활성화 함수', '손실 함수와 최적화 알고리즘', '역전파에 대해 알아볼까요?',
-        'conda를 이용한 환경 설정', 'jupyter notebook', '가상환경 설치 및 jupyter notebook 연결', 'pytorch 설치​환경 활성화', 
-        '기본 구조와 동작원리'])
-    st.write(f'{theme}')
+elif option == 'LLM & RAG':
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
+                                ['LLM이란? 강의소개!', 'LLM 시스템 형성을 위한 다양한 기법 및 요소 개념 익히기', 'OpenAI Playground 사용법 가이드',
+                                '프롬프트 엔지니어링 개념잡기!', '프롬프트 엔지니어링 맛보기', '프롬프트 엔지니어링의 기본 원칙',
+                                'Shot 계열의 프롬프팅 기법 배워보기', 'Act As 류의 프롬프팅 기법 배우기', '논리적인 추론 강화하기',
+                                '대화를 활용한 프롬프팅 기법', '형식 지정 기법',
+                                'LLM의 사용 준비하기', 'Vector DB 개념 및 RAG (Retrieval-Augmented Generation) 개념', '텍스트 처리의 핵심 기법과 임베딩 활용하기', 'LangChain: 개념과 활용', 'Python LangChain과 FAISS', 'Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩', '문서 임베딩 실습하기'])
+    st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
 st.sidebar.header('대화 내역')
 
