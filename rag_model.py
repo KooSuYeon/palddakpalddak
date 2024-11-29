@@ -376,8 +376,9 @@ def get_question(session_no:int, id:str, type_:str,  order:str):
     else:
         question = response
     
-    save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
-
+    if (id != ""):
+        save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
+    
     return ''.join(response)
 
 # txt파일로 저장된 이전에 저장된 내용을 불러오는 코드 (직접 사용 X, 다른 함수내에서 자동으로 불러와짐)
@@ -454,7 +455,8 @@ def get_question_language(session_no:int, id:str, type_:str,  order:str, languag
     
     translation = get_translation(question, language).content
     question = translation
-    save_file(question, f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
+    if (id != ""):
+        save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
     return ''.join(response)
 
@@ -492,8 +494,11 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
 
     feedback = get_translation(''.join(feedback.content), language).content
 
-    save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
-    save_file(feedback, f"{id}_{session_no}_{type_}_{order}_feedback_{feedback_file_number}.txt", rag_output_path)
+
+    if (id != ""):
+        save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
+        save_file(feedback, f"{id}_{session_no}_{type_}_{order}_feedback_{feedback_file_number}.txt", rag_output_path)
+    
     return feedback
 
 
