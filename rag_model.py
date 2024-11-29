@@ -117,11 +117,7 @@ def choose_txt_list(type_:str):
     if type_ == "llm":
         return save_docs_list("LLM", 18, txt_list)
     if type_ == "python":
-<<<<<<< HEAD
-        return save_docs_list("PYTHON", 16, txt_list)
-=======
         return save_docs_list("PYTHON", 15, txt_list)
->>>>>>> origin/main
     if type_ == "open_source":
         return save_docs_list("OPENSOURCE", 7, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
@@ -287,30 +283,16 @@ def get_session_no(id: str) -> int:
     # session_no 리스트가 비어 있다면 0 반환, 그렇지 않으면 최대값 반환
     return max(session_numbers) if session_numbers else 0
 
-<<<<<<< HEAD
 ###############################################################
 ######################## AI 퀴즈 ##############################
 ###############################################################
 def get_question(session_no:int, id:str, type_:str,  order:str):
-    """
-=======
-
-
-def get_question(session_no:int, id:str, type_:str,  order:str):
-
->>>>>>> origin/main
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
     global quiz_list
     global j
-<<<<<<< HEAD
-        
-=======
-    
-
->>>>>>> origin/main
     quiz_list = quiz_list[-5:]  # 최신 5개 퀴즈만 보관
     txt_list = choose_txt_list(type_)
 
@@ -347,24 +329,11 @@ def get_question(session_no:int, id:str, type_:str,  order:str):
     save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{j}.txt")
 
     return ''.join(response)
-<<<<<<< HEAD
-    """
-    if (type_ == "python"):
-        return "테스트 문제입니다. quiz_list 는 왜 비어있을까요? @_@"
-    elif (type_ == "dl"):
-        return "딥러닝 와도 달라지는 건 없습니다~ quiz_list 는 왜 비어있을까요? @_@"
-    elif (type_ == "ml"):
-        return "이번엔 머신러닝. quiz_list 는 왜 비어있을까요? @_@"
-    elif (type_ == "llm"):
-        return "LLM/RAG. quiz_list 는 왜 비어있을까요? @_@"
-    elif (type_ == "open_source"):
-        return "AI 활용까지 서버연결 완. quiz_list 는 왜 비어있을까요? @_@"
+
 ###############################################################
 ######################## AI 피드백 ############################
 ###############################################################
-=======
 
->>>>>>> origin/main
 def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str):
 
     load_dotenv()
@@ -421,8 +390,4 @@ if __name__ == '__main__':
     quiz_list = []
     current_index = 0
     j = 1
-<<<<<<< HEAD
     valid_type = ["dl", "ml", "llm", "python", "open_source"]
-=======
-    valid_type = ["dl", "ml", "llm", "python", "open_source"]
->>>>>>> origin/main

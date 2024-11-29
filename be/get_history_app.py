@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from model import create_quiz, create_answer # rag_model.py 파일을 임포트
+from rag_model.naive_rag_model import create_quiz, create_answer # rag_model.py 파일을 임포트
 import uvicorn
 import os
 import glob
