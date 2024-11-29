@@ -127,7 +127,7 @@ st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow
 st.sidebar.header('주제 선택')
 
 # selectbox로 주제 선택
-option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'OPENSOURCE'], index=0, key="sidebar_option)
+option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬 라이브러리', '머신러닝', '딥러닝', 'LLM, RAG', 'OPENSOURCE'], index=0, key="sidebar_option")
 if option == '파이썬 라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
