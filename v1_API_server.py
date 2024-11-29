@@ -2,12 +2,17 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
 from rag_model import get_question, get_feedback, get_session_no  # rag_model.py 파일을 임포트
+<<<<<<< HEAD
 from fastapi.responses import JSONResponse
 import os
 import glob
 import uvicorn
 import logging
 from datetime import datetime
+=======
+import uvicorn
+import logging
+>>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 
 ############ 로그 파일 생성 ######################
 logging.basicConfig(
@@ -33,7 +38,10 @@ order: int = 3
 
 # FastAPI 애플리케이션 생성
 app = FastAPI()
+<<<<<<< HEAD
 FILE_DIR = "./text_files"
+=======
+>>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 
 # CORS
 app.add_middleware(
@@ -71,10 +79,13 @@ class AnswerRequest(BaseModel):
 
 class TypeRequest(BaseModel):
     sidebox_type: str
+<<<<<<< HEAD
 
 class Conversation(BaseModel):
     user_id: int
     conversation: str
+=======
+>>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 ###############################################################
 ###################### 요청 메서드 처리 #######################
 ###############################################################
@@ -127,6 +138,7 @@ async def check_answer(request: AnswerRequest):
         logger.error(f"Unexpected error: {e}")
         raise HTTPException(status_code=500, detail="Internal server error.")
 
+<<<<<<< HEAD
 # 대화 불러오기 api
 @app.get("/get_history/{user_id}")
 async def get_history(user_id: int):
@@ -168,6 +180,8 @@ async def save_conversation(conversation: Conversation):
     
     return {"message": "Conversation saved successfully."}
 
+=======
+>>>>>>> e9bd3b1ca79bf84529161dc57f935338f3e7d117
 # 메인 함수
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
