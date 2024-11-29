@@ -34,7 +34,7 @@ st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow
 st.sidebar.header('주제 선택')
 
 # selectbox로 주제 선택
-option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬', '머신러닝', '딥러닝', 'LLM & RAG'])
+option = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬', '머신러닝', '딥러닝', 'LLM & RAG', 'OPENSOURCE'])
 if option == '파이썬 라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
@@ -73,6 +73,17 @@ elif option == 'LLM & RAG':
                                 'LLM의 사용 준비하기', 'Vector DB 개념 및 RAG (Retrieval-Augmented Generation) 개념', '텍스트 처리의 핵심 기법과 임베딩 활용하기', 'LangChain: 개념과 활용', 'Python LangChain과 FAISS', 'Sentence-Transformer, Word2Vec, 그리고 Transformer 기반 임베딩', '문서 임베딩 실습하기'])
     st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
 
+elif option == 'OPENSOURCE':
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
+                                    ['RAG 기반 비구조화된 데이터를 기반으로 질문에 답변하는 오픈 소스',
+                                    '다양한 유형의 소스(PDF, YouTube 동영상) 로부터 데이터를 가공해 RAG 파이프 라인을 구현하는 예제의 컬럼',
+                                    'ResNet을 이용한 개 고양이 분류기',
+                                    'GAN을 이용한 MNIST 숫자 생성 모델',
+                                    'ETF 예측 모델 (다중선형회귀, XGBoost, ARIMA)',
+                                    '서울시 공공 자전거 분석',
+                                    '무더위 쉼터 데이터'])
+    st.write(f'{option}의 "{textbook}" 교재에 대한 퀴즈를 시작하겠습니다!')
+    
 st.sidebar.header('대화 내역')
 
 # .env 파일에서 api 키 가져오기
