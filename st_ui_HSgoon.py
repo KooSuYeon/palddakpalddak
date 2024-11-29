@@ -176,7 +176,6 @@ theme = st.sidebar.selectbox(
 )
 
 
-
 if theme == '파이썬 라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
@@ -339,7 +338,7 @@ else:
 
     # 대화 내역을 선택할 수 있는 버튼 추가
     def get_button_label(chat_df, chat_id):
-        # 가장 마지막 사용자 메시지를 가져옵니다.
+    # 가장 마지막 사용자 메시지를 가져옵니다.
         user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")]
         if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
             last_user_message = user_messages.iloc[-1]["Content"]
