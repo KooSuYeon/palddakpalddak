@@ -127,13 +127,13 @@ def choose_txt_list(type_:str):
     txt_list = []
     if type_ == "dl":
         return save_docs_list("DL", 16, txt_list)
-    if type_ == "ml":
+    elif type_ == "ml":
         return save_docs_list("ML", 23, txt_list)
-    if type_ == "llm":
+    elif type_ == "llm":
         return save_docs_list("LLM", 18, txt_list)
-    if type_ == "python":
+    elif type_ == "python":
         return save_docs_list("PYTHON", 15, txt_list)
-    if type_ == "open_source":
+    elif type_ == "open_source":
         return save_docs_list("OPENSOURCE", 7, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
     
@@ -341,8 +341,6 @@ def get_question(session_no:int, id:str, type_:str,  order:str):
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
-    global quiz_list
-    global rag_output_path
 
     quiz_list = quiz_list[-5:]  # 최신 5개 퀴즈만 보관
     txt_list = choose_txt_list(type_)
@@ -412,13 +410,11 @@ def get_quiz_files_by_id_and_type(directory: str, id: str, type_: str) -> List[s
 ###############################################################
 
 
-def get_question_withBotton(session_no:int, id:str, type_:str,  order:str, language:str):
+def get_question_language(session_no:int, id:str, type_:str,  order:str, language:str):
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
-    global quiz_list
-    global rag_output_path
 
     quiz_list = get_quiz_files_by_id_and_type("./rag_model_output", id, type_)
     # print(*quiz_list)
@@ -472,8 +468,6 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
-    global j
-    global rag_output_path
     user_file_number = get_next_index(rag_output_path,"user", id, session_no, type_, order)
     feedback_file_number = get_next_index(rag_output_path,"feedback", id, session_no, type_, order)
 
