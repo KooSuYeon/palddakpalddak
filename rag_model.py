@@ -237,6 +237,15 @@ discription_prompt = ChatPromptTemplate.from_messages([
     """)
 ])
 
+translation_prompt = ChatPromptTemplate.from_messages([
+    ("system", f"""
+    content를 language로 번역해서 보여주세요.
+    
+    content: {{content}}
+    language:{{language}}
+    """)
+])
+
 
 def create_open_source_rag_chain(retriever, llm):
     return (
@@ -403,7 +412,7 @@ def get_quiz_files_by_id_and_type(directory: str, id: str, type_: str) -> List[s
 ###############################################################
 
 
-def get_question_withBotton(session_no:int, id:str, type_:str,  order:str):
+def get_question_withBotton(session_no:int, id:str, type_:str,  order:str, language:str):
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
@@ -445,9 +454,11 @@ def get_question_withBotton(session_no:int, id:str, type_:str,  order:str):
         discription = get_discription(response, type_, order)
         question = ''.join([discription.content, str(response)])
     else:
-        question = response
+        question = ''.join(response)
     
-    save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
+    translation = get_translation(question, language).content
+    question = translation
+    save_file(question, f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
     return ''.join(response)
 
@@ -455,7 +466,7 @@ def get_question_withBotton(session_no:int, id:str, type_:str,  order:str):
 ######################## AI 피드백 ############################
 ###############################################################
 
-def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str):
+def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str):
 
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
@@ -485,10 +496,22 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
     current_index += 5
 
-    save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
-    save_file(''.join(feedback.content), f"{id}_{session_no}_{type_}_{order}_feedback_{feedback_file_number}.txt", rag_output_path)
-    return feedback.content
+    feedback = get_translation(''.join(feedback.content), language).content
 
+    save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
+    save_file(feedback, f"{id}_{session_no}_{type_}_{order}_feedback_{feedback_file_number}.txt", rag_output_path)
+    return feedback
+
+
+def get_translation(content:str, language:str):
+    
+    load_dotenv()
+    api_key = os.getenv("OPEN_AI_KEY")
+
+    translation_chain = translation_prompt | get_llm(api_key)
+    translation = translation_chain.invoke({"content": content, "language": language})
+
+    return translation
 
 
 def get_discription(quiz, type_, order):
@@ -513,3 +536,4 @@ if __name__ == '__main__':
     quiz_list = []
     current_index = 0
     valid_type = ["dl", "ml", "llm", "python", "open_source"]
+    rag_output_path = "./rag_model_output" 
