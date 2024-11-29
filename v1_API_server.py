@@ -9,6 +9,12 @@ import uvicorn
 import logging
 from datetime import datetime
 
+# Audio model libraries
+from audio_model import generate_audio_from_text
+import io
+from pydub import AudioSegment
+from fastapi.responses import StreamingResponse
+
 ############ 로그 파일 생성 ######################
 logging.basicConfig(
     filename="API_server.log",
@@ -75,6 +81,12 @@ class TypeRequest(BaseModel):
 class Conversation(BaseModel):
     user_id: int
     conversation: str
+
+
+
+# 텍스트 데이터 모델 정의
+class TextRequest(BaseModel):
+    text: str
 
 ###############################################################
 ###################### 요청 메서드 처리 #######################
@@ -169,6 +181,29 @@ async def save_conversation(conversation: Conversation):
     
     return {"message": "Conversation saved successfully."}
 
+
+@app.post("/generate-audio/")
+async def generate_audio_endpoint(text_request: TextRequest):
+    audio_content = generate_audio_from_text(text_request.text)
+
+    if audio_content:
+        # 음성을 파일로 변환하지 않고 바로 스트리밍
+        audio_segment = AudioSegment.from_mp3(io.BytesIO(audio_content))
+
+        # api가 잘 작동하는지 보기위한 저장
+        # output_filename = "generated_audio.mp3"
+        # audio_segment.export(output_filename, format="mp3")
+        # print(f"Audio saved as {output_filename}")
+
+        audio_io = io.BytesIO()
+        audio_segment.export(audio_io, format="mp3")
+        audio_io.seek(0)
+        
+        return StreamingResponse(audio_io, media_type="audio/mpeg")
+    else:
+        raise HTTPException(status_code=500, detail="Failed to generate audio")
+
 # 메인 함수
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
