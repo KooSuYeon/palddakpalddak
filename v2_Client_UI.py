@@ -4,8 +4,73 @@ from dotenv import load_dotenv
 import os
 import pandas as pd
 import uuid
+import requests  # FastAPI와 통신
+import logging
+import subprocess
+import time
 
 load_dotenv()
+
+# .env 파일에서 api 키 가져오기
+API_KEY = os.getenv('OPENAI_API_KEY')
+
+# OpenAI API 키 설정
+if API_KEY:
+    openai.api_key = API_KEY
+else:
+    st.error("API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
+    st.stop()
+
+# CSV 파일 로드
+CSV_FILE = "chat_history.csv"
+
+# CSV 파일이 존재하면 불러오기, 없으면 새로 생성
+try:
+    chat_history_df = pd.read_csv(CSV_FILE)
+except FileNotFoundError:
+    chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
+
+
+########### FastAPI 서버 URL 선언 / 로그파일 생성 ##################
+API_BASE_URL = "http://127.0.0.1:8006"  # FastAPI 서버 로컬 호스트 값
+# API_BASE_URL = "http://0.0.0.0:8000"  # FastAPI 서버 외부 연결 시
+
+logging.basicConfig(
+    filename="Client_UI.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logging.info("Streamlit UI started.")
+
+################# FastAPI 서버 실행 및 대기 #######################
+subprocess.Popen(["uvicorn", "v1_API_server:app", "--reload", "--port", "8006"])
+def wait_for_api():
+    for _ in range(10):
+        try:
+            response = requests.get(f"{API_BASE_URL}/server_check")  # health_check 엔드포인트를 통해 서버 상태 확인
+            if response.status_code == 200:
+                break
+        except requests.exceptions.RequestException:
+            time.sleep(1)  # 서버가 준비될 때까지 1초 간격으로 반복
+    
+wait_for_api()
+
+########### session_state 전역변수 초기값 설정 ####################
+
+if "selected_theme" not in st.session_state:
+    st.session_state.selected_theme = '파이썬_라이브러리'
+if "order_str" not in st.session_state:
+    st.session_state.order_str = 'Pandas 설치 및 Jupyter Notebook 설정하기'
+if 'user_id' not in st.session_state:
+    st.session_state.user_id = 'None'
+if 'session_no' not in st.session_state:
+    st.session_state.session_no = 0
+if 'type_' not in st.session_state:
+    st.session_state.type_ = 'python'
+if 'order' not in st.session_state:
+    st.session_state.order = 1
+if 'language' not in st.session_state:
+    st.session_state.language = "한국어"
 
 # 교재별 매핑 데이터
 mapping_data = {
@@ -127,26 +192,54 @@ st.markdown('<p class="custom-title">복습 퀴즈 챗봇📖</p>', unsafe_allow
 st.sidebar.header('주제 선택')
 
 # selectbox로 주제 선택
-theme = st.sidebar.selectbox('주제를 선택하세요.', ['파이썬_라이브러리', '머신러닝', '딥러닝', 'LLM_RAG', 'OPENSOURCE'])
+theme_to_type = {
+    '파이썬_라이브러리': 'python',
+    '머신러닝': 'ml',
+    '딥러닝': 'dl',
+    'LLM_RAG': 'llm',
+    'OPENSOURCE': 'open_source'
+}
+
+def update_api_type():
+    st.session_state.type_ = theme_to_type.get(st.session_state.selected_theme)
+    response = requests.post(f"{API_BASE_URL}/set_big_topic", json={"big_topic": st.session_state.type_})
+    if response.status_code == 200:
+        st.success(f"type_ 값 '{st.session_state.type_}'으로 서버전송 성공!")
+    else:
+        st.error("type_ 값 서버전송 실패: Server code error.")
+
+def update_api_order():
+    st.write(f"현재 theme : {theme}") # 로그 기록
+    st.session_state.order = mapping_data[theme].get(st.session_state.order_str)
+    response = requests.post(f"{API_BASE_URL}/set_small_topic", json={"small_topic_order": st.session_state.order})
+    if response.status_code == 200:
+        st.success(f"order 값 '{st.session_state.order}'으로 서버전송 성공!")
+    else:
+        st.error("order 값 서버전송 실패: Server code error.")
+
+theme = st.sidebar.selectbox(
+    '주제를 선택하세요.',
+    options=list(theme_to_type.keys()),
+    key="selected_theme",  # 상태 저장 키
+    on_change=update_api_type  # 값 변경 시 콜백 호출
+)
+
+################################# 소주제 선택 #####################################
 if theme == '파이썬_라이브러리':
-    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', list(mapping_data[theme].keys()))
-
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
 elif theme == '머신러닝':
-    textbook = textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', list(mapping_data[theme].keys()))
-
+    textbook = textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
 elif theme == '딥러닝':
-    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', list(mapping_data[theme].keys()))
-
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
 elif theme == 'LLM_RAG':
-    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', list(mapping_data[theme].keys()))
-
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
 elif theme == 'OPENSOURCE':
-    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', list(mapping_data[theme].keys()))
+    textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
 
 # 언어 선택
-languages = ["한국어", "영어", "일본어"]
+language_list = ["한국어", "영어", "일본어"]
 selection = st.sidebar.segmented_control(
-    "언어", languages, selection_mode="single", default="한국어"
+    "언어", language_list, selection_mode="single", default="한국어"
 )
 st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
 
@@ -157,25 +250,6 @@ if audio_value:
     st.sidebar.audio(audio_value)
     
 st.sidebar.header('대화 내역')
-
-# .env 파일에서 api 키 가져오기
-API_KEY = os.getenv('OPENAI_API_KEY')
-
-# OpenAI API 키 설정
-if API_KEY:
-    openai.api_key = API_KEY
-else:
-    st.error("API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
-    st.stop()
-
-# CSV 파일 로드
-CSV_FILE = "chat_history.csv"
-
-# CSV 파일이 존재하면 불러오기, 없으면 새로 생성
-try:
-    chat_history_df = pd.read_csv(CSV_FILE)
-except FileNotFoundError:
-    chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
 
 # 사이드바에 '대화 저장' 버튼 추가
 if st.sidebar.button('대화 저장'):
@@ -233,6 +307,24 @@ def login_page():
 def chat_page():
     initialize_chat_history()  # 초기화 함수 호출하여 chat_history_df 세션 상태에 추가
 
+    st.write(f'{theme}에 대한 퀴즈를 내보겠습니다!')
+    try:
+        st.write(f'현재 selected_theme : {st.session_state.selected_theme}')
+        st.write(f'현재 user_id : {st.session_state.user_id}')
+        st.write(f'현재 session_no : {st.session_state.session_no}')
+        st.write(f'현재 type_ : {st.session_state.type_}')
+        st.write(f'현재 order : {st.session_state.order}')
+        st.write(f'현재 order_str : {st.session_state.order_str}')
+        st.write(f'현재 language : {st.session_state.language}')
+        response = requests.post(f"{API_BASE_URL}/generate_quiz", json={"topic": st.session_state.type_})
+        response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킴
+        quiz_data = response.json()  # JSON 데이터 추출
+        st.write(quiz_data)  # 퀴즈 내용을 출력
+        
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error making API request: {e}")
+        st.error(f"API 호출 실패: {e}")
+
     if prompt := st.chat_input("메시지를 입력하세요."):
 
         with st.chat_message("user"):
@@ -242,15 +334,14 @@ def chat_page():
 
         # GPT 모델로부터 응답 받기
         with st.chat_message("ai"):
-            response = openai.ChatCompletion.create(
-                model="gpt-4",  # 사용할 모델 지정 (gpt-4 또는 gpt-3.5-turbo 등)
-                messages=st.session_state.chat_session
-            )
-            # GPT의 응답 텍스트
-            reply = response["choices"][0]["message"]["content"]
-            st.markdown(reply)
+            quiz_content = quiz_data.get("QUIZ", "내용 없음") # 딕셔너리 형태의 quiz_data 에서 실제 QUIZ 값만 추출 (str 형식)
+            response = requests.post(f"{API_BASE_URL}/check_answer", json={"quiz": quiz_content, "user_answer" : prompt})
+            response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킴
+            feedback_data = response.json()  # JSON 데이터 추출
+            st.write(feedback_data)  # 퀴즈 내용을 출력
+            feedback_content = feedback_data.get("FeedBack","내용 없음")
             # 응답을 채팅 기록에 추가
-            st.session_state.chat_session.append({"role": "assistant", "content": reply})
+            st.session_state.chat_session.append({"role": "assistant", "content": feedback_content})
 
         # 대화 내역을 CSV에 저장
         chat_id = st.session_state["current_chat_id"]

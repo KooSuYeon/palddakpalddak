@@ -213,6 +213,16 @@ theme = st.sidebar.selectbox(
     on_change=update_api_on_select  # 값 변경 시 콜백 호출
 )
 
+
+
+
+
+
+
+
+
+
+
 if theme == '파이썬_라이브러리':
     textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?',
                                 ['Pandas 설치 및 Jupyter Notebook 설정하기',
