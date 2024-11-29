@@ -11,7 +11,7 @@ import time
 
 
 ########### FastAPI 서버 URL 선언 / 로그파일 생성 ###################
-API_BASE_URL = "http://127.0.0.1:8002"  # FastAPI 서버 로컬 호스트 값
+API_BASE_URL = "http://127.0.0.1:8003"  # FastAPI 서버 로컬 호스트 값
 # API_BASE_URL = "http://0.0.0.0:8000"  # FastAPI 서버 외부 연결 시
 
 logging.basicConfig(
@@ -22,7 +22,7 @@ logging.basicConfig(
 logging.info("Streamlit UI started.")
 
 ################# FastAPI 서버 실행 #################################
-subprocess.Popen(["uvicorn", "API_server:app", "--reload", "--port", "8002"])
+subprocess.Popen(["uvicorn", "v1_API_server:app", "--reload", "--port", "8003"])
 
 def wait_for_api():
     while True:
