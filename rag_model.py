@@ -117,7 +117,7 @@ def choose_txt_list(type_:str):
     if type_ == "llm":
         return save_docs_list("LLM", 18, txt_list)
     if type_ == "python":
-        return save_docs_list("PYTHON", 16, txt_list)
+        return save_docs_list("PYTHON", 15, txt_list)
     if type_ == "open_source":
         return save_docs_list("OPENSOURCE", 7, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
