@@ -1,0 +1,8 @@
+Q: 다음 중 가상환경을 Jupyter Notebook에 커널로 추가하는 명령어로 알맞은 것은 무엇인가요?
+
+A) conda create --name myenv python=3.8  
+B) conda activate myenv  
+C) conda install numpy pandas matplotlib  
+D) python -m ipykernel install --user --name myenv --display-name "Python (myenv)"  
+
+정답: D) python -m ipykernel install --user --name myenv --display-name "Python (myenv)"

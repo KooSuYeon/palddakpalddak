@@ -1,0 +1,8 @@
+```
+transforms_train = transforms.Compose([
+    transforms.RandomResizedCrop(size=256),
+    transforms.RandomRotation(degrees=15),
+    transforms.RandomHorizontalFlip(),
+    transforms.ToTensor()
+])
+```코드에서 `transforms.randomhorizontalflip()`은 훈련용 이미지에 수평 뒤집기 변형을 적용하나요? (O/X)
