@@ -333,6 +333,7 @@ def get_next_index(directory: str, category:str, id: str, session_no: int, type_
     return max_index + 1
 
 
+<<<<<<< HEAD
 ###############################################################
 ################ AI 퀴즈 (세션 의존성 기억) ########################
 ###############################################################
@@ -340,65 +341,36 @@ def get_question(session_no:int, id:str, type_:str,  order:int):
     
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
+=======
+>>>>>>> 089d6f86614573332561fe71c2f8256b5202a8c3
 
-    global current_index
-
-    quiz_list = quiz_list[-5:]  # 최신 5개 퀴즈만 보관
-    txt_list = choose_txt_list(type_)
-    file_number = get_next_index(rag_output_path,"quiz", id, session_no, type_, order)
-
-    retriever = get_retriever(txt_list[order-1], current_index, api_key)
-    if type_ == "open_source":
-        rag_chain = create_open_source_rag_chain(retriever, get_llm(api_key))
-    else:
-        rag_chain = create_concept_rag_chain(retriever, get_llm(api_key))
-
-    query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,       
-        )
-    
-    response = rag_chain.invoke("퀴즈 하나를 생성해줘")
-
-    while True:  # 유사하지 않은 퀴즈가 생성될 때까지 반복
-        query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,
-        )
-        response = rag_chain.invoke("퀴즈 하나를 생성해줘")
-
-        # 생성된 퀴즈가 유사하지 않다면 반복 종료
-        if len(quiz_list) == 0 or not is_similar(response, quiz_list, 0.7):
-            break
-
-    if (type_=="open_source"):
-        discription = get_discription(response, type_, order)
-        question = ''.join([discription.content, str(response)])
-    else:
-        question = response
-    
-    if (id != ""):
-        save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
-    
-    return ''.join(response)
 
 # txt파일로 저장된 이전에 저장된 내용을 불러오는 코드 (직접 사용 X, 다른 함수내에서 자동으로 불러와짐)
-def get_quiz_files_by_id_and_type(directory: str, id: str, type_: str) -> List[str]:
+from typing import List
+import os
+
+def get_quiz_files_by_id_type_order_and_session(directory: str, session_no: int, id: str, type_: str, order: int) -> List[str]:
     """
-    주어진 디렉토리에서 특정 id와 type_에 관련된 모든 _quiz 텍스트 파일의 내용을 리스트로 반환합니다.
+    주어진 디렉토리에서 특정 id, type_, order, session_no에 관련된 모든 _quiz 텍스트 파일의 내용을 리스트로 반환합니다.
     
     :param directory: 파일을 검색할 디렉토리 경로
     :param id: 검색할 id 값
     :param type_: 검색할 type 값
-    :return: id와 type_에 관련된 _quiz 텍스트 파일 내용들의 리스트
+    :param order: 검색할 order 값
+    :param session_no: 검색할 session_no 값
+    :return: id, type_, order, session_no에 관련된 _quiz 텍스트 파일 내용들의 리스트
     """
     quiz_contents = []
     
     # 디렉토리 내 모든 파일 탐색
     for root, _, files in os.walk(directory):
         for file in files:
-            # 파일 이름이 id와 type_에 관련된 형식인지 확인
-            if file.startswith(f"{id}_") and f"_{type_}_" in file and "_quiz" in file and file.endswith(".txt"):
+            # 파일 이름이 id, type_, order, session_no에 관련된 형식인지 확인
+            if (file.startswith(f"{id}_{session_no}_") and 
+                f"_{type_}_" in file and 
+                f"_{order}_" in file and 
+                "_quiz" in file and 
+                file.endswith(".txt")):
                 file_path = os.path.join(root, file)
                 # 파일 열어서 내용 읽기
                 with open(file_path, 'r', encoding='utf-8') as f:
@@ -407,18 +379,51 @@ def get_quiz_files_by_id_and_type(directory: str, id: str, type_: str) -> List[s
     
     return quiz_contents
 
+
 ###############################################################
 ################ AI 퀴즈 (서버 의존성 기억) ########################
 ###############################################################
 
+# RAG에서 docs를 순차적으로 읽게 하기 위한 함수 (직접 사용 X, 함수 내부에서 사용)
+def get_current_index(session_no: int, id: str, type_: str, order: int, base_path: str) -> int:
+    """
+    주어진 조건에 맞는 파일에서 current_index를 가져오고, += 5 한 값을 반환합니다.
+    만약 파일이 없다면 0을 반환합니다.
+    
+    Args:
+        session_no (int): 세션 번호
+        id (str): 사용자 ID
+        type_ (str): 퀴즈 타입
+        order (int): 순서
+        base_path (str): 파일이 저장된 기본 디렉토리 경로
 
+<<<<<<< HEAD
 def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str):
+=======
+    Returns:
+        int: 새로운 current_index 값
+    """
+    pattern = rf"{id}_{session_no}_{type_}_{order}_quiz_(\d+)\.txt"  # 파일명 패턴
+    max_quiz_number = 0
+
+    # base_path 디렉토리 내 파일들을 검색
+    for filename in os.listdir(base_path):
+        match = re.match(pattern, filename)
+        if match:
+            quiz_number = int(match.group(1))  # 파일명에서 quiz 숫자 추출
+            max_quiz_number = max(max_quiz_number, quiz_number)
+
+    # 새로운 current_index 값 계산 (quiz_number * 5)
+    return max_quiz_number * 5
+
+
+def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str, rag_output_path:str, current_index:int):
+>>>>>>> 089d6f86614573332561fe71c2f8256b5202a8c3
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
-    global current_index
-
-    quiz_list = get_quiz_files_by_id_and_type("./rag_model_output", id, type_)
+    current_index = get_current_index(session_no, id, type_, order, rag_output_path)
+    quiz_list = get_quiz_files_by_id_type_order_and_session("./rag_model_output", session_no, id, type_, order)
     # print(*quiz_list)
     txt_list = choose_txt_list(type_)
     file_number = get_next_index(rag_output_path,"quiz", id, session_no, type_, order)
@@ -465,7 +470,7 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
 ######################## AI 피드백 ############################
 ###############################################################
 
-def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str):
+def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str, rag_output_path:str):
 
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
@@ -526,14 +531,3 @@ def get_discription(quiz, type_, order):
 
     return discription
         
-
-if __name__ == '__main__':
-
-    global quiz_list
-    global current_index
-    global rag_output_path
-
-    quiz_list = []
-    current_index = 0
-    valid_type = ["dl", "ml", "llm", "python", "open_source"]
-    rag_output_path = "./rag_model_output" 
