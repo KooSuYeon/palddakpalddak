@@ -30,9 +30,9 @@ def generate_audio_from_text(text):
         "model_id": "eleven_multilingual_v2",
         # "voice_id": voice_id, 
         "voice_settings": {
-            "stability": 0.5,
+            "stability": 0.6,
             "similarity_boost": 1,
-            "style": 1,
+            "style": 0.3,
             "use_speaker_boost": True
         }
     }
