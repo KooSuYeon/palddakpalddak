@@ -1,6 +1,6 @@
-
 dataset_spartanotion.py
 RAG
+api.http
 # 가상환경 활성화 코드
 # RAG\Scripts\activate
 
@@ -11,3 +11,4 @@ requirements.txt
 # pip uninstall 패키지 # 패키지 하나씩 지우기
 AI_boot
 .env
+
