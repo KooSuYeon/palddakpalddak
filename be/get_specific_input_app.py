@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
-from model import create_quiz, create_answer  # rag_model.py 파일을 임포트
+from rag_model.naive_rag_model import create_quiz, create_answer  # rag_model.py 파일을 임포트
 import uvicorn
 import logging
 
