@@ -406,10 +406,10 @@ def get_current_index(session_no: int, id: str, type_: str, order: int, base_pat
 
 def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str, rag_output_path:str, current_index:int):
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAPI_AI_KEY")
 
     current_index = get_current_index(session_no, id, type_, order, rag_output_path)
-    quiz_list = get_quiz_files_by_id_type_order_and_session("./rag_model_output", session_no, id, type_, order)
+    quiz_list = get_quiz_files_by_id_type_order_and_session(rag_output_path, session_no, id, type_, order)
     # print(*quiz_list)
     txt_list = choose_txt_list(type_)
     file_number = get_next_index(rag_output_path,"quiz", id, session_no, type_, order)
@@ -459,7 +459,7 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
 def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str, rag_output_path:str):
 
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAPI_AI_KEY")
 
     global current_index
     user_file_number = get_next_index(rag_output_path,"user", id, session_no, type_, order)
@@ -497,7 +497,7 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
 def get_translation(content:str, language:str):
     
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAPI_AI_KEY")
 
     translation_chain = translation_prompt | get_llm(api_key)
     translation = translation_chain.invoke({"content": content, "language": language})
@@ -508,7 +508,7 @@ def get_translation(content:str, language:str):
 def get_discription(quiz, type_, order):
 
     load_dotenv()
-    api_key = os.getenv("OPEN_AI_KEY")
+    api_key = os.getenv("OPENAPI_AI_KEY")
 
     discription_chain = discription_prompt | get_llm(api_key)
     txt_list = choose_txt_list(type_)
@@ -517,3 +517,12 @@ def get_discription(quiz, type_, order):
 
     return discription
         
+
+
+########## 호스팅 연결 테스트용 함수 ##################
+
+def get_question_language_test(session_no:int, id:str, type_:str,  order:int, language:str, rag_output_path:str, current_index:int):
+    return "연결만 성공.. (AI 모듈 확인 필요) \n rag_model 의 get_question_language 함수 디버깅 필요"
+
+def get_feedback_test(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str, rag_output_path:str):
+    return "연결만 성공.. (AI 모듈 확인 필요) \n rag_model 의 get_feedback 함수 디버깅 필요"
