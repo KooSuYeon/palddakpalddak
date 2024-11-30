@@ -38,7 +38,7 @@ global rag_output_path
 global language
 
 
-user_id: str = "sj5black"
+user_id: str = "None"
 session_no: int = get_session_no(user_id)
 type_: str = "python"
 order: int = 1
@@ -93,8 +93,8 @@ class SetLanguage(BaseModel):
     lang: str
 
 class Conversation(BaseModel):
-    user_id: int
-    conversation: str
+    requested_user_id: str
+    chatlog: str
 
 # 텍스트 데이터 모델 정의
 class TextRequest(BaseModel):
@@ -168,7 +168,7 @@ async def check_answer(request: AnswerRequest):
 
 # 대화 불러오기 api
 @app.get("/get_history/{user_id}")
-async def get_history(user_id: int):
+async def get_history(user_id: str):
     # 파일 경로 패턴
     pattern = os.path.join(FILE_DIR, f"{user_id}_*.txt")
     
@@ -194,7 +194,7 @@ async def get_history(user_id: int):
 async def save_conversation(conversation: Conversation):
     # 현재 시간을 밀리초 단위로 포함하여 파일 이름 설정
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # 예: 20241126_153045_123456
-    file_name = f"{conversation.user_id}_{timestamp}.txt"
+    file_name = f"{conversation.requested_user_id}_{timestamp}.txt"
     file_path = os.path.join(FILE_DIR, file_name)
     
     # 파일 디렉토리가 없으면 생성
@@ -203,7 +203,7 @@ async def save_conversation(conversation: Conversation):
     
     # 대화 내용 파일에 추가
     with open(file_path, "a", encoding="utf-8") as file:
-        file.write(conversation.conversation)
+        file.write(conversation.chatlog)
     
     return {"message": "Conversation saved successfully."}
 
