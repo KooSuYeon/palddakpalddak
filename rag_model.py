@@ -9,12 +9,11 @@ from langchain.schema import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from typing import List
 
 from dotenv import load_dotenv
 import os
-
-import json
-from pprint import pprint
+import re
 
 
 def get_llm(api_key:str):
@@ -85,12 +84,28 @@ def get_retriever(texts: str, current_index:int, api_key=str):
 
 
 
-def save_file(txt:str, file_name:str):
-
-    with open(file_name, 'w', encoding='utf-8') as content_file:
+def save_file(txt: str, file_name: str, directory: str):
+    """
+    주어진 디렉토리에 텍스트 파일을 저장합니다. 디렉토리가 없으면 생성합니다.
+    
+    :param txt: 저장할 텍스트 내용
+    :param file_name: 저장할 파일 이름
+    :param directory: 파일을 저장할 디렉토리 경로
+    """
+    # 디렉토리가 존재하지 않으면 생성
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+        print(f"디렉토리가 생성되었습니다: {directory}")
+    
+    # 디렉토리와 파일 이름 결합
+    file_path = os.path.join(directory, file_name)
+    
+    # 파일 저장
+    with open(file_path, 'w', encoding='utf-8') as content_file:
         content_file.write(txt)
+    
+    print(f"=========TEXT 파일 저장 완료: {file_path}===========")
 
-    print(f"=========TEXT 파일 저장 완료: {file_name}===========")
 
 
 class DebugPassThrough(RunnablePassthrough):
@@ -111,14 +126,14 @@ def choose_txt_list(type_:str):
 
     txt_list = []
     if type_ == "dl":
-        return save_docs_list("DL", 23, txt_list)
-    if type_ == "ml":
-        return save_docs_list("ML", 16, txt_list)
-    if type_ == "llm":
+        return save_docs_list("DL", 16, txt_list)
+    elif type_ == "ml":
+        return save_docs_list("ML", 23, txt_list)
+    elif type_ == "llm":
         return save_docs_list("LLM", 18, txt_list)
-    if type_ == "python":
+    elif type_ == "python":
         return save_docs_list("PYTHON", 15, txt_list)
-    if type_ == "open_source":
+    elif type_ == "open_source":
         return save_docs_list("OPENSOURCE", 7, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
     
@@ -222,6 +237,15 @@ discription_prompt = ChatPromptTemplate.from_messages([
     """)
 ])
 
+translation_prompt = ChatPromptTemplate.from_messages([
+    ("system", f"""
+    content를 language로 번역해서 보여주세요.
+    
+    content: {{content}}
+    language:{{language}}
+    """)
+])
+
 
 def create_open_source_rag_chain(retriever, llm):
     return (
@@ -257,11 +281,8 @@ def is_similar(new_quiz, quiz_list, threshold=0.8):
     return any(sim >= threshold for sim in similarities[0])
 
 
-
+# 세션 넘버가 바뀌어야 할 때 불러야 하는 함수
 def get_session_no(id: str) -> int:
-
-    global j
-    j  = 1
 
     # 현재 디렉토리에서 id가 포함된 모든 txt 파일 검색
     txt_files = [f for f in os.listdir('.') if f.startswith(id) and f.endswith('.txt')]
@@ -283,18 +304,116 @@ def get_session_no(id: str) -> int:
     # session_no 리스트가 비어 있다면 0 반환, 그렇지 않으면 최대값 반환
     return max(session_numbers) if session_numbers else 0
 
+
+# 자동으로 다음 index를 반환해주는 코드 (직접 사용 X, 다른 함수내에서 자동으로 불러와짐)
+def get_next_index(directory: str, category:str, id: str, session_no: int, type_: str, order: str) -> int:
+    """
+    특정 id, session_no, type_, order에 해당하는 quiz 파일의 다음 인덱스를 반환합니다.
+    
+    :param directory: 파일을 검색할 디렉토리 경로
+    :param id: 검색할 id 값
+    :param session_no: 세션 번호
+    :param type_: 검색할 type 값
+    :param order: 검색할 order 값
+    :return: 다음에 사용될 quiz 인덱스 (j 값)
+    """
+    pattern = re.compile(rf"^{id}_{session_no}_{type_}_{order}_{category}_(\d+)\.txt$")
+    max_index = 0
+
+    # 디렉토리 내 모든 파일 탐색
+    for root, _, files in os.walk(directory):
+        for file in files:
+            match = pattern.match(file)
+            if match:
+                # 파일 이름에서 인덱스를 추출
+                index = int(match.group(1))
+                max_index = max(max_index, index)
+
+    # 기존 인덱스가 없으면 1, 있으면 max_index + 1 반환
+    return max_index + 1
+
+
+
+
+# txt파일로 저장된 이전에 저장된 내용을 불러오는 코드 (직접 사용 X, 다른 함수내에서 자동으로 불러와짐)
+from typing import List
+import os
+
+def get_quiz_files_by_id_type_order_and_session(directory: str, session_no: int, id: str, type_: str, order: int) -> List[str]:
+    """
+    주어진 디렉토리에서 특정 id, type_, order, session_no에 관련된 모든 _quiz 텍스트 파일의 내용을 리스트로 반환합니다.
+    
+    :param directory: 파일을 검색할 디렉토리 경로
+    :param id: 검색할 id 값
+    :param type_: 검색할 type 값
+    :param order: 검색할 order 값
+    :param session_no: 검색할 session_no 값
+    :return: id, type_, order, session_no에 관련된 _quiz 텍스트 파일 내용들의 리스트
+    """
+    quiz_contents = []
+    
+    # 디렉토리 내 모든 파일 탐색
+    for root, _, files in os.walk(directory):
+        for file in files:
+            # 파일 이름이 id, type_, order, session_no에 관련된 형식인지 확인
+            if (file.startswith(f"{id}_{session_no}_") and 
+                f"_{type_}_" in file and 
+                f"_{order}_" in file and 
+                "_quiz" in file and 
+                file.endswith(".txt")):
+                file_path = os.path.join(root, file)
+                # 파일 열어서 내용 읽기
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    quiz_contents.append(content)
+    
+    return quiz_contents
+
+
 ###############################################################
-######################## AI 퀴즈 ##############################
+################ AI 퀴즈 (서버 의존성 기억) ########################
 ###############################################################
-def get_question(session_no:int, id:str, type_:str,  order:str):
+
+# RAG에서 docs를 순차적으로 읽게 하기 위한 함수 (직접 사용 X, 함수 내부에서 사용)
+def get_current_index(session_no: int, id: str, type_: str, order: int, base_path: str) -> int:
+    """
+    주어진 조건에 맞는 파일에서 current_index를 가져오고, += 5 한 값을 반환합니다.
+    만약 파일이 없다면 0을 반환합니다.
+    
+    Args:
+        session_no (int): 세션 번호
+        id (str): 사용자 ID
+        type_ (str): 퀴즈 타입
+        order (int): 순서
+        base_path (str): 파일이 저장된 기본 디렉토리 경로
+
+    Returns:
+        int: 새로운 current_index 값
+    """
+    pattern = rf"{id}_{session_no}_{type_}_{order}_quiz_(\d+)\.txt"  # 파일명 패턴
+    max_quiz_number = 0
+
+    # base_path 디렉토리 내 파일들을 검색
+    for filename in os.listdir(base_path):
+        match = re.match(pattern, filename)
+        if match:
+            quiz_number = int(match.group(1))  # 파일명에서 quiz 숫자 추출
+            max_quiz_number = max(max_quiz_number, quiz_number)
+
+    # 새로운 current_index 값 계산 (quiz_number * 5)
+    return max_quiz_number * 5
+
+
+def get_question_language(session_no:int, id:str, type_:str,  order:int, language:str, rag_output_path:str, current_index:int):
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
-    global current_index
-    global quiz_list
-    global j
-    quiz_list = quiz_list[-5:]  # 최신 5개 퀴즈만 보관
+    current_index = get_current_index(session_no, id, type_, order, rag_output_path)
+    quiz_list = get_quiz_files_by_id_type_order_and_session("./rag_model_output", session_no, id, type_, order)
+    # print(*quiz_list)
     txt_list = choose_txt_list(type_)
+    file_number = get_next_index(rag_output_path,"quiz", id, session_no, type_, order)
+
 
     retriever = get_retriever(txt_list[order-1], current_index, api_key)
     if type_ == "open_source":
@@ -324,9 +443,12 @@ def get_question(session_no:int, id:str, type_:str,  order:str):
         discription = get_discription(response, type_, order)
         question = ''.join([discription.content, str(response)])
     else:
-        question = response
+        question = ''.join(response)
     
-    save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{j}.txt")
+    translation = get_translation(question, language).content
+    question = translation
+    if (id != ""):
+        save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
     return ''.join(response)
 
@@ -334,14 +456,15 @@ def get_question(session_no:int, id:str, type_:str,  order:str):
 ######################## AI 피드백 ############################
 ###############################################################
 
-def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str):
+def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_answer:str, language:str, rag_output_path:str):
 
     load_dotenv()
     api_key = os.getenv("OPEN_AI_KEY")
 
     global current_index
-    global j
-    
+    user_file_number = get_next_index(rag_output_path,"user", id, session_no, type_, order)
+    feedback_file_number = get_next_index(rag_output_path,"feedback", id, session_no, type_, order)
+
 
     feedback_prompt = ChatPromptTemplate.from_messages([
             ("system", f"""
@@ -361,11 +484,25 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
     current_index += 5
 
-    save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{j}.txt")
-    save_file(''.join(feedback.content), f"{id}_{session_no}_{type_}_{order}_feedback_{j}.txt")
-    j += 1
-    return feedback.content
+    feedback = get_translation(''.join(feedback.content), language).content
 
+
+    if (id != ""):
+        save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
+        save_file(feedback, f"{id}_{session_no}_{type_}_{order}_feedback_{feedback_file_number}.txt", rag_output_path)
+    
+    return feedback
+
+
+def get_translation(content:str, language:str):
+    
+    load_dotenv()
+    api_key = os.getenv("OPEN_AI_KEY")
+
+    translation_chain = translation_prompt | get_llm(api_key)
+    translation = translation_chain.invoke({"content": content, "language": language})
+
+    return translation
 
 
 def get_discription(quiz, type_, order):
@@ -380,14 +517,3 @@ def get_discription(quiz, type_, order):
 
     return discription
         
-
-if __name__ == '__main__':
-
-    global quiz_list
-    global current_index
-    global j
-
-    quiz_list = []
-    current_index = 0
-    j = 1
-    valid_type = ["dl", "ml", "llm", "python", "open_source"]

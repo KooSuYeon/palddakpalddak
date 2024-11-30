@@ -1,13 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
-from rag_model import get_question, get_feedback, get_session_no  # rag_model.py 파일을 임포트
+from rag_model import get_feedback, get_session_no, get_question_language  # rag_model.py 파일을 임포트
 from fastapi.responses import JSONResponse
 import os
 import glob
 import uvicorn
 import logging
 from datetime import datetime
+
+# Audio model libraries
+from audio_model import generate_audio_from_text
+import io
+from pydub import AudioSegment
+from fastapi.responses import StreamingResponse
 
 ############ 로그 파일 생성 ######################
 logging.basicConfig(
@@ -25,11 +31,19 @@ global session_no
 global type_
 global order
 global quiz
+global quiz_list
+global current_index
+global rag_output_path
+global language
+
 
 user_id: str = "sj5black"
 session_no: int = get_session_no(user_id)
 type_: str = "python"
-order: int = 3
+order: int = 1
+rag_output_path: str = "./rag_model_output"
+current_index: int = 0
+language: str = "한국어"
 
 # FastAPI 애플리케이션 생성
 app = FastAPI()
@@ -76,6 +90,12 @@ class Conversation(BaseModel):
     user_id: int
     conversation: str
 
+
+
+# 텍스트 데이터 모델 정의
+class TextRequest(BaseModel):
+    text: str
+
 ###############################################################
 ###################### 요청 메서드 처리 #######################
 ###############################################################
@@ -105,7 +125,7 @@ async def generate_quiz(request: QuizRequest):
     #     raise HTTPException(status_code=400, detail="선택된 주제와 AI가 생성한 topic이 일치하지 않았습니다.")
     try:
         logger.info(f"Generating quiz for topic: {request.topic}")
-        quiz = get_question(session_no, user_id, request.topic, order)
+        quiz = get_question_language(session_no, user_id, request.topic, order, language, rag_output_path, current_index)
         return {"퀴즈": quiz}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
@@ -119,7 +139,7 @@ async def generate_quiz(request: QuizRequest):
 async def check_answer(request: AnswerRequest):
     try:
         logger.info(f"Checking answer for context {request.user_answer}")
-        feedback = get_feedback(session_no, user_id, type_, order, quiz, request.user_answer)
+        feedback = get_feedback(session_no, user_id, type_, order, quiz, request.user_answer, current_index)
         return {"피드백": feedback}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
@@ -168,6 +188,28 @@ async def save_conversation(conversation: Conversation):
         file.write(conversation.conversation)
     
     return {"message": "Conversation saved successfully."}
+
+
+@app.post("/generate-audio/")
+async def generate_audio_endpoint(text_request: TextRequest):
+    audio_content = generate_audio_from_text(text_request.text)
+
+    if audio_content:
+        # 음성을 파일로 변환하지 않고 바로 스트리밍
+        audio_segment = AudioSegment.from_mp3(io.BytesIO(audio_content))
+
+        # api가 잘 작동하는지 보기위한 저장
+        # output_filename = "generated_audio.mp3"
+        # audio_segment.export(output_filename, format="mp3")
+        # print(f"Audio saved as {output_filename}")
+
+        audio_io = io.BytesIO()
+        audio_segment.export(audio_io, format="mp3")
+        audio_io.seek(0)
+        
+        return StreamingResponse(audio_io, media_type="audio/mpeg")
+    else:
+        raise HTTPException(status_code=500, detail="Failed to generate audio")
 
 # 메인 함수
 if __name__ == "__main__":
