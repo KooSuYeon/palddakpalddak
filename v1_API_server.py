@@ -89,6 +89,9 @@ class SetBigTopic(BaseModel):
 class SetSmallTopic(BaseModel):
     small_topic_order: int
 
+class SetLanguage(BaseModel):
+    lang: str
+
 class Conversation(BaseModel):
     user_id: int
     conversation: str
@@ -106,16 +109,24 @@ class TextRequest(BaseModel):
 async def server_check():
     return {"status": "ok"}
 
-# 대주제, 소주제 변경요청 처리
+# 대주제 변경요청 처리
 @app.post("/set_big_topic")
 async def set_type(request: SetBigTopic):
-    type_ = request.big_topic  # 받은 type을 전역변수에 저장 (str)
+    type_ = request.big_topic  # 요청받은 type을 전역변수 type_에 저장 (str)
     logger.info(f"set_big_topic -> type_ : {type_}")
     return {"message": f"Selected type has been set to: {type_}"}
 
+# 소주제 변경요청 처리
 @app.post("/set_small_topic")
 async def set_type(request: SetSmallTopic):
-    order = request.small_topic_order  # 받은 order값을 전역변수에 저장 (int)
+    order = request.small_topic_order  # 요청받은 order값을 전역변수 order에 저장 (int)
+    logger.info(f"set_small_topic -> order : {order}")
+    return {"message": f"Selected type has been set to: {order}"}
+
+# 언어 변경요청 처리
+@app.post("/set_language")
+async def set_type(request: SetLanguage):
+    language = request.lang  # 요청받은 lang값을 전역변수 language에 저장 (str)
     logger.info(f"set_small_topic -> order : {order}")
     return {"message": f"Selected type has been set to: {order}"}
 
