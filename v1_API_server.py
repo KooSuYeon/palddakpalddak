@@ -1,7 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, validator
-from rag_model import get_feedback, get_session_no, get_question_language  # rag_model.py 파일을 임포트
+from rag_model import get_feedback, get_session_no, get_question_language
+from rag_model import get_question_language_test, get_feedback_test
 from fastapi.responses import JSONResponse
 import os
 import glob
@@ -37,11 +38,11 @@ global rag_output_path
 global language
 
 
-user_id: str = "sj5black"
+user_id: str = "None"
 session_no: int = get_session_no(user_id)
 type_: str = "python"
 order: int = 1
-rag_output_path: str = "./rag_model_output"
+rag_output_path: str = os.path.abspath("./rag_model_output")
 current_index: int = 0
 language: str = "한국어"
 
@@ -74,23 +75,26 @@ class QuizRequest(BaseModel):
     pass
 
 class AnswerRequest(BaseModel):
-    # context: str
+    quiz: str
     user_answer: str
-
     # @validator("context", "answer")
     # def validate_not_empty(cls, value):
     #     if not value.strip():
     #         raise ValueError("Fields must not be empty.")
     #     return value
 
-class TypeRequest(BaseModel):
-    sidebox_type: str
+class SetBigTopic(BaseModel):
+    big_topic: str
+
+class SetSmallTopic(BaseModel):
+    small_topic_order: int
+
+class SetLanguage(BaseModel):
+    lang: str
 
 class Conversation(BaseModel):
-    user_id: int
-    conversation: str
-
-
+    requested_user_id: str
+    chatlog: str
 
 # 텍스트 데이터 모델 정의
 class TextRequest(BaseModel):
@@ -105,12 +109,26 @@ class TextRequest(BaseModel):
 async def server_check():
     return {"status": "ok"}
 
-# type 변수 
-@app.post("/set_type")
-async def set_type(request: TypeRequest):
-    type_ = request.sidebox_type  # 받은 type을 전역변수에 저장
-    logger.info(f"set_type test -> type_ : {type_}")
+# 대주제 변경요청 처리
+@app.post("/set_big_topic")
+async def set_type(request: SetBigTopic):
+    type_ = request.big_topic  # 요청받은 type을 전역변수 type_에 저장 (str)
+    logger.info(f"set_big_topic -> type_ : {type_}")
     return {"message": f"Selected type has been set to: {type_}"}
+
+# 소주제 변경요청 처리
+@app.post("/set_small_topic")
+async def set_type(request: SetSmallTopic):
+    order = request.small_topic_order  # 요청받은 order값을 전역변수 order에 저장 (int)
+    logger.info(f"set_small_topic -> order : {order}")
+    return {"message": f"Selected type has been set to: {order}"}
+
+# 언어 변경요청 처리
+@app.post("/set_language")
+async def set_type(request: SetLanguage):
+    language = request.lang  # 요청받은 lang값을 전역변수 language에 저장 (str)
+    logger.info(f"set_small_topic -> order : {order}")
+    return {"message": f"Selected type has been set to: {order}"}
 
 # 퀴즈 생성 엔드포인트
 @app.post("/generate_quiz")
@@ -125,8 +143,8 @@ async def generate_quiz(request: QuizRequest):
     #     raise HTTPException(status_code=400, detail="선택된 주제와 AI가 생성한 topic이 일치하지 않았습니다.")
     try:
         logger.info(f"Generating quiz for topic: {request.topic}")
-        quiz = get_question_language(session_no, user_id, request.topic, order, language, rag_output_path, current_index)
-        return {"퀴즈": quiz}
+        quiz = get_question_language_test(session_no, user_id, request.topic, order, language, rag_output_path, current_index)
+        return {"QUIZ": quiz}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
         raise HTTPException(status_code=400, detail=str(ve))
@@ -139,8 +157,8 @@ async def generate_quiz(request: QuizRequest):
 async def check_answer(request: AnswerRequest):
     try:
         logger.info(f"Checking answer for context {request.user_answer}")
-        feedback = get_feedback(session_no, user_id, type_, order, quiz, request.user_answer, current_index)
-        return {"피드백": feedback}
+        feedback = get_feedback_test(session_no, user_id, type_, order, request.quiz, request.user_answer, language, rag_output_path)
+        return {"FeedBack": feedback}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
         raise HTTPException(status_code=400, detail=str(ve))
@@ -150,7 +168,7 @@ async def check_answer(request: AnswerRequest):
 
 # 대화 불러오기 api
 @app.get("/get_history/{user_id}")
-async def get_history(user_id: int):
+async def get_history(user_id: str):
     # 파일 경로 패턴
     pattern = os.path.join(FILE_DIR, f"{user_id}_*.txt")
     
@@ -176,7 +194,7 @@ async def get_history(user_id: int):
 async def save_conversation(conversation: Conversation):
     # 현재 시간을 밀리초 단위로 포함하여 파일 이름 설정
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # 예: 20241126_153045_123456
-    file_name = f"{conversation.user_id}_{timestamp}.txt"
+    file_name = f"{conversation.requested_user_id}_{timestamp}.txt"
     file_path = os.path.join(FILE_DIR, file_name)
     
     # 파일 디렉토리가 없으면 생성
@@ -185,7 +203,7 @@ async def save_conversation(conversation: Conversation):
     
     # 대화 내용 파일에 추가
     with open(file_path, "a", encoding="utf-8") as file:
-        file.write(conversation.conversation)
+        file.write(conversation.chatlog)
     
     return {"message": "Conversation saved successfully."}
 
