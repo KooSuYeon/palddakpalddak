@@ -37,7 +37,7 @@ wait_for_api()
 ####################### OpenAI API키 호출 ###########################
 # .env 파일에서 api 키 가져오기
 load_dotenv()
-API_KEY = os.getenv('openai_api_key')
+API_KEY = os.getenv('OPENAI_API_KEY')
 if API_KEY:
     openai.api_key = API_KEY
 else:
