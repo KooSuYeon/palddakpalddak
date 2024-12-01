@@ -1,0 +1,6 @@
+ChatID,Role,Content
+aaa,assistant,"연결만 성공.. (AI 모듈 확인 필요) 
+ rag_model 의 get_question_language 함수 디버깅 필요"
+aaa,user,ㅁㅁㅁ
+aaa,assistant,"연결만 성공.. (AI 모듈 확인 필요) 
+ rag_model 의 get_feedback 함수 디버깅 필요"
