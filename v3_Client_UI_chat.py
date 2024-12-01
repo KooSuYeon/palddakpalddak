@@ -113,9 +113,9 @@ def initialize_chat_history():
       st.session_state.chat_history_df = pd.DataFrame(columns=["UserID", "ChatID", "Role", "Content"])
     
 
-def get_quiz_from_api():
+def get_quiz_from_api(topic):
     # POST 요청에서 보내는 데이터
-    data = {"topic": "asdf"}
+    data = {"topic": topic}
     
     response = requests.post("http://localhost:8000/generate_quiz", json=data)
     if response.status_code == 200:
@@ -134,6 +134,8 @@ def get_feedback_from_api():
    else:
        st.error("Feedback을 불러오는 데 실패했습니다.")
        return None   
+
+    
 
 # 사용자 입력 받기
 def chat_page():
@@ -175,6 +177,7 @@ def chat_page():
     for content in st.session_state.chat_session:
         with st.chat_message("ai" if content["role"] == "assistant" else "user"):
             st.markdown(content["content"])
+
         # 사이드바 구성하기
     st.sidebar.header('주제 선택')
     
@@ -196,25 +199,29 @@ def chat_page():
     
     if audio_value:
         st.sidebar.audio(audio_value)
-        
-    st.sidebar.header('대화 내역')
+    
 
     
-    # # 사이드바에 '대화 저장' 버튼 추가
-    # if st.sidebar.button('새 세션 만들기'):
-    #     # initialize_chat_history()
-    #     chat_history_df.to_csv("chat_history.txt", sep="\t", index=False)
-    #     st.sidebar.write("대화가 TXT 파일로 저장되었습니다.")
-    #     # st.session_state.theme = theme
-    #     # st.session_state.language = language
-    #     # st.session_state.textbook = textbook
+    # 사이드바에 '대화 저장' 버튼 추가
+    if st.sidebar.button('새 세션 만들기'):
+        st.session_state.chat_session = []
+        st.session_state.current_chat_id = str(uuid.uuid4())[:8]
+        st.session_state.theme = theme
+        st.session_state.language = language
+        st.session_state.textbook = textbook
+        st.session_state.quiz_shown = False
+        st.session_state.current_quiz = False
+        st.rerun()
+
+
+    st.sidebar.header('대화 내역')
 
     initialize_chat_history()  # 초기화 함수 호출하여 chat_history_df 세션 상태에 추가
   
     
     # 처음 실행 시 퀴즈를 출력
     if not st.session_state.quiz_shown:
-        st.session_state.current_quiz = get_quiz_from_api()  # 퀴즈 가져오기
+        st.session_state.current_quiz = get_quiz_from_api(st.session_state.theme)  # 퀴즈 가져오기
         with st.chat_message("ai"):
             st.markdown(st.session_state.current_quiz)
             st.session_state.chat_session.append(
@@ -241,7 +248,7 @@ def chat_page():
             st.session_state.new_row.append({"role": "assistant", "content": feedback})
     
         # 3. 새로운 퀴즈 출력
-        st.session_state.current_quiz = get_quiz_from_api()  # 새 퀴즈 가져오기
+        st.session_state.current_quiz = get_quiz_from_api(st.session_state.theme)  # 새 퀴즈 가져오기
         with st.chat_message("ai"):
             st.markdown(st.session_state.current_quiz)
             st.session_state.chat_session.append(
@@ -279,8 +286,7 @@ def chat_page():
         user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "assistant") & (chat_df["UserID"].astype(str) == user_id)]
         if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
             first_quiz = user_messages.iloc[0]["Content"]
-            print(first_quiz)
-            return f"{' '.join(first_quiz.split()[:5])}..."  # 마지막 메시지의 첫 5단어를 표시
+            return f"{first_quiz}..."  # 마지막 메시지의 첫 5단어를 표시
         else:
             return f"No User message found"  # 메시지가 없으면 안내 문구 표시
 
