@@ -7,10 +7,11 @@ import uuid
 import requests  # FastAPI와 통신
 import logging
 import subprocess
+import atexit
 import time
 from streamlit.runtime.scriptrunner import RerunException # 페이지 새로고침
 
-load_dotenv()
+load_dotenv() #환경변수 값 로드 (API 포함)
 
 # 페이지 구성
 st.set_page_config(
@@ -19,14 +20,6 @@ st.set_page_config(
     layout='centered',
     initial_sidebar_state='auto'
 )
-
-# OpenAI API 키 설정
-API_KEY = os.getenv('OPENAI_API_KEY')
-if API_KEY:
-    openai.api_key = API_KEY
-else:
-    st.error("API 키가 설정되지 않았습니다. .env 파일을 확인하세요.")
-    st.stop()
 
 # CSV 파일 관련 로드/초기값 생성
 CSV_FILE = "chat_history.csv"
@@ -41,7 +34,7 @@ else:
     chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
 
 ########### FastAPI 서버 URL 선언 / 로그파일 생성 ##################
-API_BASE_URL = "http://127.0.0.1:8008"  # FastAPI 서버 로컬 호스트 값
+API_BASE_URL = "http://127.0.0.1:8001"  # FastAPI 서버 로컬 호스트 값
 # API_BASE_URL = "http://0.0.0.0:8000"  # FastAPI 서버 외부 연결 시
 
 logging.basicConfig(
@@ -51,8 +44,34 @@ logging.basicConfig(
 )
 logging.info("Streamlit UI started.")
 
-################# FastAPI 서버 실행 및 대기 #######################
-subprocess.Popen(["uvicorn", "v1_API_server:app", "--reload", "--port", "8008"])
+################# FastAPI 서버 실행/종료 관련 모듈 개선 #######################
+# API 서버 실행
+def start_api_server():
+    process = subprocess.Popen(["uvicorn", "v1_API_server:app", "--reload", "--port", "8001"])
+    return process
+
+# API 서버 종료
+def stop_api_server(process):
+    process.terminate()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        process.kill()
+    print("API 서버가 종료되었습니다.")
+
+# 세션 종료 시 API 서버 종료하도록 설정
+def on_session_end():
+    if 'api_server_process' in st.session_state:
+        stop_api_server(st.session_state.api_server_process)
+
+# 종료 시점에 호출될 함수 등록
+atexit.register(on_session_end)
+
+# Streamlit UI 실행
+if 'api_server_process' not in st.session_state:
+    st.session_state.api_server_process = start_api_server()
+    st.success("API 서버가 시작되었습니다.")
+
 def wait_for_api():
     for _ in range(10):
         try:
@@ -288,7 +307,7 @@ def chat_page():
     if audio_value:
         st.sidebar.audio(audio_value)
         
-    st.sidebar.header('마지막 대화 내용')
+    st.sidebar.header('채팅 기록 보기')
     
     # 퀴즈 생성 함수
     def generate_quiz():
@@ -417,17 +436,17 @@ def chat_page():
     
     # 사이드바에 '대화 저장' 버튼 추가
     if st.sidebar.button('전체 대화내역 저장'):
-        # if len(st.session_state.chat_history_df) > 0:
-        #     for chat_id in st.session_state.chat_history_df["ChatID"].unique():
-        #         loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
-        #         loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
-        #         st.session_state.chat_log = loaded_chat_string
+        if len(st.session_state.chat_history_df) > 0:
+            for chat_id in st.session_state.chat_history_df["ChatID"].unique():
+                loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
+                loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
+                st.session_state.chat_log = loaded_chat_string
 
         # 서버 요청
         try:
             response = requests.post(
                 f"{API_BASE_URL}/save_conversation",
-                json={"requested_user_id": st.session_state.user_id, "chatlog": loaded_chat_string}
+                json={"requested_user_id": st.session_state.user_id, "chatlog": "st.session_state.chat_log"}
             )
             response.raise_for_status()
             st.success("채팅 로그 서버전송 성공!")
@@ -479,6 +498,29 @@ def login_page():
         if user_id:
             # ID를 입력하면 채팅 페이지로 이동
             st.session_state.user_id = user_id
+
+            try:
+                # API 호출
+                response = requests.get(f"{API_BASE_URL}/get_history/{user_id}")
+                
+                # 응답 상태 확인
+                if response.status_code == 200:
+                    files = response.json()  # API로부터 JSON 데이터를 받아옴
+
+                    # 받은 파일을 로컬 디렉토리에 저장
+                    for file in files:
+                        file_path = os.path.join("./text_files", file["file_name"])
+                        with open(file_path, "w", encoding="utf-8") as f:
+                            f.write(file["content"])
+
+                    st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! " 
+                            f"'{len(files)}'개의 파일을 다운로드했습니다. '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
+                else:
+                    st.error(f"서버 요청 실패: {response.status_code} - {response.text}")
+
+            except requests.exceptions.RequestException as e:
+                st.error(f"서버와 통신하는 중 오류가 발생했습니다: {e}")
+
             st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
             st.session_state.page = 'chat'  # 페이지를 'chat'으로 설정
             
