@@ -158,12 +158,17 @@ def chat_page():
 
     if 'theme' not in st.session_state:
         st.session_state.theme = False
+    
+    if 'new_row' not in st.session_state:
+        st.session_state.new_row = []
+
 
 
         # Streamlit에서 상태 관리: 첫 실행인지 확인
     if "quiz_shown" not in st.session_state:
         st.session_state.quiz_shown = False
         st.session_state.chat_session = []  # 대화 기록 저장
+        st.session_state.new_row = [] # 데이터 베이스에 저장할 기록 
         st.session_state.current_quiz = None  # 현재 퀴즈
 
     # 기존 채팅 기록 표시
@@ -197,12 +202,12 @@ def chat_page():
     
     # 사이드바에 '대화 저장' 버튼 추가
     if st.sidebar.button('새 세션 만들기'):
-        initialize_chat_history()
+        # initialize_chat_history()
         chat_history_df.to_csv("chat_history.txt", sep="\t", index=False)
         st.sidebar.write("대화가 TXT 파일로 저장되었습니다.")
-        st.session_state.theme = theme
-        st.session_state.language = language
-        st.session_state.textbook = textbook
+        # st.session_state.theme = theme
+        # st.session_state.language = language
+        # st.session_state.textbook = textbook
 
     initialize_chat_history()  # 초기화 함수 호출하여 chat_history_df 세션 상태에 추가
   
@@ -215,6 +220,9 @@ def chat_page():
             st.session_state.chat_session.append(
                 {"role": "assistant", "content": st.session_state.current_quiz}
             )
+            st.session_state.new_row.append(
+                {"role": "assistant", "content": st.session_state.current_quiz}
+            )
         st.session_state.quiz_shown = True
     
     # 사용자 입력 처리
@@ -223,12 +231,14 @@ def chat_page():
         with st.chat_message("user"):
             st.markdown(prompt)
             st.session_state.chat_session.append({"role": "user", "content": prompt})
+            st.session_state.new_row.append({"role": "user", "content": prompt})
     
         # 2. 피드백 출력
         with st.chat_message("ai"):
             feedback = get_feedback_from_api()  # API에서 피드백 가져오기
             st.markdown(feedback)
             st.session_state.chat_session.append({"role": "assistant", "content": feedback})
+            st.session_state.new_row.append({"role": "assistant", "content": feedback})
     
         # 3. 새로운 퀴즈 출력
         st.session_state.current_quiz = get_quiz_from_api()  # 새 퀴즈 가져오기
@@ -237,11 +247,14 @@ def chat_page():
             st.session_state.chat_session.append(
                 {"role": "assistant", "content": st.session_state.current_quiz}
             )
+            st.session_state.new_row.append(
+                {"role": "assistant", "content": st.session_state.current_quiz}
+            )
     
         # 대화 내역을 CSV에 저장
         new_rows = []
 
-        for content in st.session_state.chat_session:
+        for content in st.session_state.new_row:
             new_rows.append({
                 "UserID": st.session_state.user_id,
                 "ChatID": st.session_state.current_chat_id,
@@ -258,6 +271,8 @@ def chat_page():
         # CSV 파일에 저장
         st.session_state.chat_history_df.to_csv(CSV_FILE, index=False)
 
+        st.session_state.new_row = []
+
     # 대화 내역을 선택할 수 있는 버튼 추가
     def get_button_label(user_id, chat_df, chat_id):
         # 가장 마지막 사용자 메시지를 가져옵니다.
@@ -272,22 +287,22 @@ def chat_page():
     if len(st.session_state.chat_history_df) > 0:
         # UserID가 세션의 user_id와 같은 데이터만 필터링
         user_chat_df = st.session_state.chat_history_df[st.session_state.chat_history_df["UserID"] == st.session_state.user_id]
-        
+
         if len(user_chat_df) > 0:
             # 필터링된 데이터에서 ChatID별로 버튼 생성
             for chat_id in user_chat_df["ChatID"].unique():
                 button_label = get_button_label(st.session_state.user_id, user_chat_df, chat_id)
-                
+
                 # 사이드바 버튼 생성
                 if st.sidebar.button(button_label, key=f"btn_{chat_id}"):
                     # 선택된 ChatID의 대화 데이터 필터링
                     loaded_chat = user_chat_df[user_chat_df["ChatID"] == chat_id]
                     loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
-                    
+
                     # 텍스트 영역에 대화 내용 표시
                     st.text_area("Chat History", value=loaded_chat_string, height=300)
         else:
             st.sidebar.write("현재 사용자에 대한 저장된 대화가 없습니다.")
     else:
         st.sidebar.write("저장된 대화가 없습니다.")
-    
+
