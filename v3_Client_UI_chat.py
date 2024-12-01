@@ -276,17 +276,22 @@ def chat_page():
     # 대화 내역을 선택할 수 있는 버튼 추가
     def get_button_label(user_id, chat_df, chat_id):
         # 가장 마지막 사용자 메시지를 가져옵니다.
-        user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user") & (chat_df["UserID"] == user_id)]
+        user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "assistant") & (chat_df["UserID"].astype(str) == user_id)]
         if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
-            last_user_message = user_messages.iloc[-1]["Content"]
-            return f"Chat {chat_id[0:7]}: {' '.join(last_user_message.split()[:5])}..."  # 마지막 메시지의 첫 5단어를 표시
+            first_quiz = user_messages.iloc[0]["Content"]
+            print(first_quiz)
+            return f"{' '.join(first_quiz.split()[:5])}..."  # 마지막 메시지의 첫 5단어를 표시
         else:
-            return f"Chat {chat_id[0:7]}: No User message found"  # 메시지가 없으면 안내 문구 표시
+            return f"No User message found"  # 메시지가 없으면 안내 문구 표시
 
     # 사이드바에 저장된 대화 기록을 표시
     if len(st.session_state.chat_history_df) > 0:
-        # UserID가 세션의 user_id와 같은 데이터만 필터링
-        user_chat_df = st.session_state.chat_history_df[st.session_state.chat_history_df["UserID"] == st.session_state.user_id]
+        
+        user_chat_df = st.session_state.chat_history_df[
+            st.session_state.chat_history_df["UserID"].astype(str) == st.session_state.user_id
+        ]   
+
+
 
         if len(user_chat_df) > 0:
             # 필터링된 데이터에서 ChatID별로 버튼 생성
