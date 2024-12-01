@@ -200,14 +200,14 @@ def chat_page():
     st.sidebar.header('대화 내역')
 
     
-    # 사이드바에 '대화 저장' 버튼 추가
-    if st.sidebar.button('새 세션 만들기'):
-        # initialize_chat_history()
-        chat_history_df.to_csv("chat_history.txt", sep="\t", index=False)
-        st.sidebar.write("대화가 TXT 파일로 저장되었습니다.")
-        # st.session_state.theme = theme
-        # st.session_state.language = language
-        # st.session_state.textbook = textbook
+    # # 사이드바에 '대화 저장' 버튼 추가
+    # if st.sidebar.button('새 세션 만들기'):
+    #     # initialize_chat_history()
+    #     chat_history_df.to_csv("chat_history.txt", sep="\t", index=False)
+    #     st.sidebar.write("대화가 TXT 파일로 저장되었습니다.")
+    #     # st.session_state.theme = theme
+    #     # st.session_state.language = language
+    #     # st.session_state.textbook = textbook
 
     initialize_chat_history()  # 초기화 함수 호출하여 chat_history_df 세션 상태에 추가
   
