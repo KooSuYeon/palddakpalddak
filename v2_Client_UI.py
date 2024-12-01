@@ -19,7 +19,7 @@ load_dotenv() #환경변수 값 로드 (API 포함)
 
 # 페이지 구성
 st.set_page_config(
-    page_title='팔딱이',
+    page_title='학습 퀴즈 AI',
     page_icon='🤖',
     layout='centered',
     initial_sidebar_state='auto'
@@ -74,7 +74,7 @@ atexit.register(on_session_end)
 # Streamlit UI 실행
 if 'api_server_process' not in st.session_state:
     st.session_state.api_server_process = start_api_server()
-    st.success("API 서버가 시작되었습니다.")
+    print("API 서버가 시작되었습니다.")
 
 def wait_for_api():
     for _ in range(10):
@@ -228,6 +228,12 @@ theme_to_type = {
     'LLM_RAG': 'llm',
     'OPENSOURCE': 'open_source'
 }
+# value 값으로 key 를 반환
+def get_key_by_value(value):
+    for key, val in theme_to_type.items():
+        if val == value:
+            return key
+    return None
 
 # 초기 화면 (고정)
 st.markdown(
@@ -242,46 +248,85 @@ st.markdown(
     """,
     unsafe_allow_html=True,
 )
-st.markdown('<p class="custom-title">📖복습 퀴즈 챗봇</p>', unsafe_allow_html=True)
+st.markdown('<p class="custom-title">복습퀴즈 챗봇 ✨팔딱이✨</p>', unsafe_allow_html=True)
 
-# 기존 채팅 기록 표시
-for content in st.session_state.chat_session:
-    with st.chat_message("ai" if content["role"] == "assistant" else "user"):
-        st.markdown(content["content"])
+# 최근 대화목록 생성/갱신
+def update_recent_chats():
+    # 파일 목록 가져오기
+    files = [
+        f for f in os.listdir(CHATLOG_CLIENT_DIR)
+        if f.startswith(st.session_state.user_id) and f.endswith(".txt")]
+    
+    # 파일 정렬: datetime 순으로 정렬
+    files.sort(key=lambda x: datetime.strptime(x.split("_")[1] + "_" + x.split("_")[2], "%Y%m%d_%H%M%S"), reverse=True)
+    # 가장 최근 파일 5개 선택
+    recent_files = files[:5]
+    # 각 파일에 대해 버튼 생성
+    for i, file in enumerate(recent_files, start=1):
+        file_path = os.path.join(CHATLOG_CLIENT_DIR, file)
+        with open(file_path, "r", encoding="utf-8") as f:
+            content = f.read()  # 파일 내용 읽
+        # 파일 내용 출력 버튼 추가
+        if st.sidebar.button(f"{st.session_state.user_id}님의 최근 대화 {i}"):
+            st.text_area("채팅 내역", value=content, height=300)  
+
+# CSV 파일에 마지막 대화 갱신 (append)
+def append_newchat_to_CSV():
+    chat_id = st.session_state.user_id
+    new_rows = []
+    content = st.session_state.chat_session[-1]
+    new_rows.append({
+        "ChatID": chat_id,
+        "Role": content["role"],
+        "Content": content["content"]
+    })
+    # 마지막 대화내용을 DataFrame으로 변환하여 저장
+    new_data_df = pd.DataFrame(new_rows)
+    st.session_state.chat_history_df = pd.concat([st.session_state.chat_history_df, new_data_df], ignore_index=True) # 기존 chat_history_df와 new_data_df를 합침
+    st.session_state.chat_history_df.to_csv(CSV_FILE, index=False) # CSV 파일에 저장
 
 ################ 콜백 함수 선언 (API 서버에 요청) ######################
-# 대주제 변경 시
+# 서버에 저장된 user_id의 최근 대화를 클라이언트 폴더에 저장
+def get_recent_chats_fromServer():
+    try:
+        response = requests.get(f"{API_BASE_URL}/get_history/{st.session_state.user_id}") # 서버에 이전 대화내역 요청
+        
+        # 응답 상태 확인
+        if response.status_code == 200:
+            files = response.json()
+            # CHATLOG_CLIENT_DIR 경로 폴더가 없으면 새로 생성
+            os.makedirs(CHATLOG_CLIENT_DIR, exist_ok=True)
+            # 서버로부터 받은 파일을 로컬 디렉토리에 저장
+            for file in files:
+                file_path = os.path.join(CHATLOG_CLIENT_DIR, file["file_name"])
+                with open(file_path, "w", encoding="utf-8") as f:
+                    f.write(file["content"])
+        else:
+            st.error(f"서버 요청 실패: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        st.error(f"서버와 통신하는 중 오류가 발생했습니다: {e}")
+
+# 아이디 갱신 요청
 def update_api_user_id():
     response = requests.post(f"{API_BASE_URL}/set_user_id", json={"requested_user_id": st.session_state.user_id})
     if response.status_code == 200:
-        st.success(f"user_id 값 '{st.session_state.user_id}'으로 서버전송 성공!")
+        print(f"user_id 값 '{st.session_state.user_id}'으로 서버전송 성공!")
     else:
-        st.error("user_id 값 서버전송 실패: " + response.text)
-# 대주제 변경 시
-def update_api_type():
-    st.session_state.type_ = theme_to_type.get(st.session_state.selected_theme)
-    response = requests.post(f"{API_BASE_URL}/set_big_topic", json={"big_topic": st.session_state.type_})
-    if response.status_code == 200:
-        st.success(f"type_ 값 '{st.session_state.type_}'으로 서버전송 성공!")
-    else:
-        st.error("type_ 값 서버전송 실패: " + response.text)
-# 소제목 변경 시
-def update_api_order():
-    st.session_state.order = mapping_data[theme].get(st.session_state.order_str)
-    response = requests.post(f"{API_BASE_URL}/set_small_topic", json={"small_topic_order": st.session_state.order})
-    if response.status_code == 200:
-        st.success(f"order 값 '{st.session_state.order}'으로 서버전송 성공!")
-    else:
-        st.error("order 값 서버전송 실패: " + response.text)
-# 언어 변경 시
+        print("user_id 값 서버전송 실패: " + response.text)
+# 언어 갱신 요청
 def update_language():
     selected_language = st.session_state.language
     response = requests.post(f"{API_BASE_URL}/set_language", json={"lang": selected_language})
     if response.status_code == 200:
-        st.success(f"'{selected_language}'로 언어 변경 성공!")
+        print(f"'{selected_language}'로 언어 변경 성공!")
     else:
-        st.error("language값 서버전송 실패: " + response.text)
+        print("language값 서버전송 실패: " + response.text)
 ######################################################################
+
+# 기존 채팅기록 표시
+for content in st.session_state.chat_session:
+    with st.chat_message("ai" if content["role"] == "🤖" else "user"):
+        st.markdown(content["content"])
 
 # 전체 채팅 화면
 def chat_page():
@@ -291,23 +336,41 @@ def chat_page():
     # 사이드바 구성하기
     st.sidebar.header('주제 선택')
 
+    # 대주제 갱신 요청
+    def update_api_type():
+        st.session_state.type_ = theme_to_type.get(st.session_state.selected_theme)
+        response = requests.post(f"{API_BASE_URL}/set_big_topic", json={"big_topic": st.session_state.type_})
+        if response.status_code == 200:
+            print(f"type_ 값 '{st.session_state.type_}'으로 서버전송 성공!")
+        else:
+            print("type_ 값 서버전송 실패: " + response.text)
+
     theme = st.sidebar.selectbox('주제를 선택하세요.', options=list(theme_to_type.keys()), key="selected_theme", on_change=update_api_type)
 
+    # 소제목 갱신 요청
+    def update_api_order():
+        st.session_state.order = mapping_data[theme].get(st.session_state.order_str)
+        response = requests.post(f"{API_BASE_URL}/set_small_topic", json={"small_topic_order": st.session_state.order})
+        if response.status_code == 200:
+            print(f"order 값 '{st.session_state.order}'으로 서버전송 성공!")
+        else:
+            print("order 값 서버전송 실패: " + response.text)
+
     if theme == '파이썬_라이브러리':
-        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
+        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
     elif theme == '머신러닝':
-        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
+        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
     elif theme == '딥러닝':
-        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
+        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
     elif theme == 'LLM_RAG':
-        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
+        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
     elif theme == 'OPENSOURCE':
-        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order)
+        textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
 
     # 언어 선택
     language_list = ["한국어", "영어", "일본어"]
     selection = st.sidebar.segmented_control("언어", language_list, selection_mode="single", default="한국어", key="language", on_change=update_language)
-    st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
+    # st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
     
     # 녹음 기능
     audio_value = st.sidebar.audio_input("음성으로 대화해보세요.")
@@ -319,7 +382,8 @@ def chat_page():
     
     # 퀴즈 생성 함수
     def generate_quiz():
-        st.markdown("(팔딱이가 QUIZ를 작성중입니다...)")
+        # with st.chat_message("ai"):
+        #     st.markdown("(팔딱이가 퀴즈를 작성중입니다...)")
         st.session_state.quiz_status_check = 1
         try:
             # 로그 코드
@@ -333,7 +397,7 @@ def chat_page():
             # st.write(f'현재 chat_session : {st.session_state.chat_session}')
             # st.write(f'현재 chat_history_df : {st.session_state.chat_history_df}')
             # st.write(f'현재 chat_log : {st.session_state.chat_log}')
-
+            
             response = requests.post(f"{API_BASE_URL}/generate_quiz", json={"topic": st.session_state.type_})
             response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킴
             quiz_data = response.json()  # JSON 데이터 추출
@@ -343,13 +407,12 @@ def chat_page():
                 st.markdown(quiz_data["QUIZ"])
 
             # 퀴즈 내용을 채팅 기록에 추가
-            st.session_state.chat_session.append({"role": "assistant", "content": quiz_data["QUIZ"]})
-            
+            st.session_state.chat_session.append({"role": "🤖", "content": quiz_data["QUIZ"]})
+            append_newchat_to_CSV()
+
         except requests.exceptions.RequestException as e:
             logging.error(f"Error making API request: {e}")
             st.error(f"API 호출 실패: {e}")
-
-    
 
     if prompt := st.chat_input("메시지를 입력하세요."):
         
@@ -357,12 +420,13 @@ def chat_page():
         with st.chat_message("user"):
             st.markdown(prompt)
             # 사용자의 입력을 채팅 기록에 추가
-            st.session_state.chat_session.append({"role": "user", "content": prompt})
+            st.session_state.chat_session.append({"role": "👤" , "content": prompt})
+            append_newchat_to_CSV()
 
         # AI 에게 피드백 받기
         with st.chat_message("ai"):
             if st.session_state.quiz_status_check == 1 :
-                st.markdown("(팔딱이가 답변을 작성중입니다...)")
+                st.markdown("(팔딱이가 피드백을 작성중입니다...)")
                 quiz_content = st.session_state.quiz_data.get("QUIZ", "내용 없음") # 딕셔너리 형태의 quiz_data 에서 실제 QUIZ 값만 추출 (str 형식)
                 response = requests.post(f"{API_BASE_URL}/check_answer", json={"quiz": quiz_content, "user_answer" : prompt})
                 response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킴
@@ -370,10 +434,12 @@ def chat_page():
                 st.markdown(feedback_data["FeedBack"])
                 feedback_content = feedback_data.get("FeedBack","내용 없음")
                 # 응답을 채팅 기록에 추가
-                st.session_state.chat_session.append({"role": "assistant", "content": feedback_content})
+                st.session_state.chat_session.append({"role": "🤖", "content": feedback_content})
+                append_newchat_to_CSV()
                 st.session_state.quiz_status_check += 1
+
             elif st.session_state.quiz_status_check > 1 :
-                st.markdown("(팔딱이가 답변을 작성중입니다...)")
+                # st.markdown("(팔딱이가 답변을 작성중입니다...)")
                 try:
                     # GPT에게 메시지 전달
                     # 마지막 두 개의 딕셔너리 요소 추출
@@ -392,117 +458,77 @@ def chat_page():
                     gpt_answer_str = gpt_response.choices[0].message.content  # GPT의 응답 내용 중 content 내용만 추출
                     st.markdown(gpt_answer_str)  # 응답 출력
                     # 응답을 채팅 기록에 추가
-                    st.session_state.chat_session.append({"role": "assistant", "content": gpt_answer_str})
+                    st.session_state.chat_session.append({"role": "🤖", "content": gpt_answer_str})
+                    append_newchat_to_CSV()
+
                 except openai.OpenAIError as e:
                     st.error(f"GPT 응답 생성 중 오류가 발생했습니다: {e}")
 
             elif st.session_state.quiz_status_check == 0 :
                 st.markdown("QUIZ 시작 버튼을 눌러 퀴즈를 시작해주세요.") # 최초 퀴즈 생성이 되지 않은 경우, 기본값을 반환
-
-        # 대화 내역을 CSV에 저장
-        chat_id = st.session_state.user_id
-        new_rows = []
-
-        for content in st.session_state.chat_session:
-            new_rows.append({
-                "ChatID": chat_id,
-                "Role": content["role"],
-                "Content": content["content"]
-            })
-
-        # 새로운 데이터를 DataFrame으로 변환
-        new_data_df = pd.DataFrame(new_rows)
-
-        # 기존 chat_history_df와 new_data_df를 합침
-        st.session_state.chat_history_df = pd.concat([st.session_state.chat_history_df, new_data_df], ignore_index=True)
-
-        # CSV 파일에 저장
-        st.session_state.chat_history_df.to_csv(CSV_FILE, index=False)
+                st.session_state.chat_session.append({"role": "🤖", "content": "QUIZ 시작 버튼을 눌러 퀴즈를 시작해주세요."})
+                append_newchat_to_CSV()
+        
 
     if st.button('QUIZ 시작'):
         generate_quiz()
 
     # 대화 내역을 선택할 수 있는 버튼 추가
-    def get_button_label(chat_df, chat_id):
-        # 가장 마지막 사용자 메시지를 가져옵니다.
-        user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")]
-        if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
-            last_user_message = user_messages.iloc[-1]["Content"]
-            return f"{chat_id[0:7]} : {' '.join(last_user_message.split()[:10])}"  # 마지막 메시지의 첫 10단어를 표시
-        else:
-            return f"{chat_id[0:7]} : No User message found"  # 메시지가 없으면 안내 문구 표시
+    # def get_button_label(chat_df, chat_id):
+    #     # 가장 마지막 사용자 메시지를 가져옵니다.
+    #     user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")]
+    #     if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
+    #         last_user_message = user_messages.iloc[-1]["Content"]
+    #         return f"{chat_id[0:7]} : {' '.join(last_user_message.split()[:10])}"  # 마지막 메시지의 첫 10단어를 표시
+    #     else:
+    #         return f"{chat_id[0:7]} : No User message found"  # 메시지가 없으면 안내 문구 표시
 
     # 사이드바에 저장된 대화 기록을 표시
     if len(st.session_state.chat_history_df) > 0:
         # 이미 버튼이 만들어져 있다면 대화 목록 표시
         for chat_id in st.session_state.chat_history_df["ChatID"].unique():
-            button_label = get_button_label(st.session_state.chat_history_df, chat_id)
-            if st.sidebar.button(button_label):
+            # button_label = get_button_label(st.session_state.chat_history_df, chat_id)
+            if st.sidebar.button(f"{st.session_state.user_id}님의 현재 대화"):
                 loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
-                loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
+                loaded_chat_string = "\n\n".join(f"{row['Role']}\n{row['Content']}" for _, row in loaded_chat.iterrows())
                 st.session_state.chat_log = loaded_chat_string
                 st.text_area("채팅 내역", value=loaded_chat_string, height=300)
     else:
         st.sidebar.write("진행중인 대화가 없습니다.")
     
-    # 사이드바에 '대화 저장' 버튼 추가
-    if st.sidebar.button('현재 대화내용 저장'):
-        if len(st.session_state.chat_history_df) > 0:
-            for chat_id in st.session_state.chat_history_df["ChatID"].unique():
-                loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
-                loaded_chat_string = "\n".join(f"{row['Role']}: {row['Content']}" for _, row in loaded_chat.iterrows())
-                st.session_state.chat_log = loaded_chat_string
-
-        # 서버 요청
+    # 새로운 대화 세션 시작 버튼 (이전 대화저장 기능 포함)
+    if st.sidebar.button('새 대화 시작'):
+        # 서버에 현재 대화기록 저장
         try:
             response = requests.post(
                 f"{API_BASE_URL}/save_conversation",
                 json={"requested_user_id": st.session_state.user_id, "chatlog": st.session_state.chat_log}
             )
             response.raise_for_status()
-            st.success("채팅 로그 서버전송 성공!")
+            st.success("현재 대화가 서버에 저장되었습니다.")
         except requests.exceptions.RequestException as e:
             st.error(f"서버 요청 실패: {e}")
-        # else:
-        #     st.sidebar.write("저장할 대화가 없습니다.")
-    
+        
+        # 대화세션 관련 정보 초기화
+        st.session_state.chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
+        st.session_state.chat_log =""
+        st.session_state.chat_session = []
+        st.session_state.quiz_status_check = 0
+
+        get_recent_chats_fromServer() #서버에 저장된 대화기록 불러오기 + 클라 저장
+        # update_recent_chats() # 최근 대화목록 갱신 <-- 버튼 중복생성 이슈
+        st.rerun() # 채팅창 동기화를 위해 화면 갱신
+
     st.sidebar.header('최근 대화내역')
 
     # 사이드바에 저장된 대화 기록을 표시
     if os.path.exists(CHATLOG_CLIENT_DIR):
     # 디렉토리 내 파일이나 폴더가 있는지 확인
         if os.listdir(CHATLOG_CLIENT_DIR):
-            # 파일 목록 가져오기
-            files = [
-                f for f in os.listdir(CHATLOG_CLIENT_DIR)
-                if f.startswith(st.session_state.user_id) and f.endswith(".txt")
-            ]
-
-            # 파일 정렬: datetime 순으로 정렬
-            files.sort(key=lambda x: datetime.strptime(x.split("_")[1] + "_" + x.split("_")[2], "%Y%m%d_%H%M%S"), reverse=True)
-
-            # 가장 최근 파일 5개 선택
-            recent_files = files[:5]
-
-            # 각 파일에 대해 버튼 생성
-            for i, file in enumerate(recent_files, start=1):
-                file_path = os.path.join(CHATLOG_CLIENT_DIR, file)
-                with open(file_path, "r", encoding="utf-8") as f:
-                    content = f.read()  # 파일 내용 읽기
-
-                # 파일 내용 출력 버튼 추가
-                if st.sidebar.button(f"{st.session_state.user_id}님의 최근 대화 {i}"):
-                    st.text_area("채팅 내역", value=content, height=300)
+            update_recent_chats()
 
 # ID 입력 화면
 def login_page():
-    # 페이지 구성
-    # st.set_page_config(
-    #     page_title='팔딱이',
-    #     page_icon='🤖',
-    #     layout='centered',
-    #     initial_sidebar_state='auto'
-    # )
     
     st.markdown("""
         <div style="text-align: center;">
@@ -515,7 +541,6 @@ def login_page():
 
     user_id = st.text_input("ID를 입력하세요.", key="custom_input", placeholder="ID 입력", label_visibility="visible", help="ID를 입력하세요.")
     
-    # 버튼 스타일링을 위한 CSS 적용
     st.markdown("""
         <style>
             .centered-button {
@@ -531,40 +556,17 @@ def login_page():
             }
         </style>
     """, unsafe_allow_html=True)
+
     if st.button('로그인', key='chat_button', use_container_width=True):
         if user_id:
-            # ID를 입력하면 채팅 페이지로 이동
             st.session_state.user_id = user_id
-            update_api_user_id()
 
-            try:
-                # API 호출
-                response = requests.get(f"{API_BASE_URL}/get_history/{user_id}")
-                
-                # 응답 상태 확인
-                if response.status_code == 200:
-                    files = response.json()  # API로부터 JSON 데이터를 받아옴
+            update_api_user_id() # 유저 아이디 서버 전송
+            get_recent_chats_fromServer() # 서버로부터 대화내역 로드 + 클라 저장
 
-                    # CHATLOG_CLIENT_DIR 경로 폴더가 없으면 새로 생성
-                    os.makedirs(CHATLOG_CLIENT_DIR, exist_ok=True)
-
-                    # 서버로부터 받은 파일을 로컬 디렉토리에 저장
-                    for file in files:
-                        file_path = os.path.join(CHATLOG_CLIENT_DIR, file["file_name"])
-                        with open(file_path, "w", encoding="utf-8") as f:
-                            f.write(file["content"])
-
-                    st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! " 
-                            f"'{len(files)}'개의 파일을 다운로드했습니다. '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
-                else:
-                    st.error(f"서버 요청 실패: {response.status_code} - {response.text}")
-
-            except requests.exceptions.RequestException as e:
-                st.error(f"서버와 통신하는 중 오류가 발생했습니다: {e}")
-
-            st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
+            # st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
             st.session_state.page = 'chat'  # 페이지를 'chat'으로 설정
-            
+            st.rerun() # 로그인 동기화를 위해 화면 갱신
         else:
             st.error('채팅에 사용할 ID를 먼저 입력해주세요.')
 
