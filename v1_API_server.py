@@ -47,7 +47,8 @@ language: str = "한국어"
 
 # FastAPI 애플리케이션 생성
 app = FastAPI()
-FILE_DIR = "./text_files"
+CHATLOG_SERVER_DIR = "./user_chatlog_server"
+CHATLOG_CLIENT_DIR = "./user_chatlog_client"
 RAG_OUTPUT = "./rag_model_output"
 
 # CORS
@@ -83,6 +84,9 @@ class AnswerRequest(BaseModel):
     #         raise ValueError("Fields must not be empty.")
     #     return value
 
+class SetUserID(BaseModel):
+    requested_user_id: str
+
 class SetBigTopic(BaseModel):
     big_topic: str
 
@@ -105,14 +109,21 @@ class TextRequest(BaseModel):
 async def server_check():
     return {"status": "ok"}
 
-# 대주제 변경요청 처리
+# user_id 변경요청 처리
+@app.post("/set_user_id")
+async def set_type(request: SetUserID):
+    user_id = request.requested_user_id  # 요청받은 type을 전역변수 type_에 저장 (str)
+    logger.info(f"set_user_id -> {user_id}")
+    return {"message": f"Server user_id has been set to: {user_id}"}
+
+# 대주제(type_) 변경요청 처리
 @app.post("/set_big_topic")
 async def set_type(request: SetBigTopic):
     type_ = request.big_topic  # 요청받은 type을 전역변수 type_에 저장 (str)
     logger.info(f"set_big_topic -> type_ : {type_}")
     return {"message": f"Selected type has been set to: {type_}"}
 
-# 소주제 변경요청 처리
+# 소주제(order) 변경요청 처리
 @app.post("/set_small_topic")
 async def set_type(request: SetSmallTopic):
     order = request.small_topic_order  # 요청받은 order값을 전역변수 order에 저장 (int)
@@ -132,7 +143,7 @@ async def generate_quiz(request: QuizRequest):
     #     raise HTTPException(status_code=400, detail="선택된 주제와 AI가 생성한 topic이 일치하지 않았습니다.")
     try:
         logger.info(f"Generating quiz for topic: {request.topic}")
-        quiz = get_question_language_test(session_no, user_id, request.topic, order, language, RAG_OUTPUT, current_index)
+        quiz = get_question_language(session_no, user_id, request.topic, order, language, RAG_OUTPUT, current_index)
         return {"QUIZ": quiz}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
@@ -149,7 +160,7 @@ async def check_answer(request: AnswerRequest):
     # logger.info(f"QUIZ : {quiz}")
     try:
         logger.info(f"Checking answer for context {request.user_answer}")
-        feedback = get_feedback_test(session_no, user_id, type_, order, request.quiz, request.user_answer, language, RAG_OUTPUT)
+        feedback = get_feedback(session_no, user_id, type_, order, request.quiz, request.user_answer, language, RAG_OUTPUT)
         return {"FeedBack": feedback}
     except ValueError as ve:
         logger.error(f"ValueError: {ve}")
@@ -171,7 +182,7 @@ async def set_type(request: SetLanguage):
 @app.get("/get_history/{user_id}")
 async def get_history(user_id: str):
     # 파일 경로 패턴
-    pattern = os.path.join(FILE_DIR, f"{user_id}_*.txt")
+    pattern = os.path.join(CHATLOG_SERVER_DIR, f"{user_id}_*.txt")
     
     # 패턴에 맞는 파일경로들을 str 형식으로 file_paths 리스트에 저장
     file_paths = glob.glob(pattern)
@@ -196,11 +207,11 @@ async def save_conversation(conversation: Conversation):
     # 현재 시간을 밀리초 단위로 포함하여 파일 이름 설정
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # 예: 20241126_153045_123456
     file_name = f"{conversation.requested_user_id}_{timestamp}.txt"
-    file_path = os.path.join(FILE_DIR, file_name)
+    file_path = os.path.join(CHATLOG_SERVER_DIR, file_name)
     
     # 파일 디렉토리가 없으면 생성
-    if not os.path.exists(FILE_DIR):
-        os.makedirs(FILE_DIR)
+    if not os.path.exists(CHATLOG_SERVER_DIR):
+        os.makedirs(CHATLOG_SERVER_DIR)
     
     # 대화 내용 파일에 추가
     with open(file_path, "a", encoding="utf-8") as file:
@@ -233,3 +244,5 @@ async def generate_audio_endpoint(text_request: TextRequest):
 # 메인 함수
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
+
+# 아이디 서버에 넘기는 부분 추가 필요
