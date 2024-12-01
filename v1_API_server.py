@@ -43,7 +43,7 @@ session_no: int = get_session_no(user_id) + 1
 type_: str = "python"
 order: int = 1
 current_index: int = 0
-language: str = "한국어"
+language: str = "KO"
 
 # FastAPI 애플리케이션 생성
 app = FastAPI()
@@ -174,7 +174,10 @@ async def check_answer(request: AnswerRequest):
 # 언어 변경요청 처리
 @app.post("/set_language")
 async def set_type(request: SetLanguage):
+
+    global language
     language = request.lang  # 요청받은 lang값을 전역변수 language에 저장 (str)
+    logger.info(f"set_language -> language : {language}")
     logger.info(f"set_language -> order : {order}")
     return {"message": f"Selected type has been set to: {order}"}
 
