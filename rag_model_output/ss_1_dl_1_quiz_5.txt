@@ -1,5 +1,0 @@
-Which of the following areas does not utilize deep learning?  
-a) Speech recognition  
-b) Agricultural management  
-c) Natural language processing  
-d) Medical image analysis
