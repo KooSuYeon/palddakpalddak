@@ -1,2 +1,0 @@
-- Correct answer: "No"
-- Additional explanation: Deep learning is widely used in the field of speech recognition. Deep learning algorithms are used to convert speech to text or to understand voice commands. Therefore, (a) speech recognition is a field where deep learning is applied. The field of agricultural management is relatively less known, but there are studies being conducted that use deep learning to monitor crop conditions or predict yields. Therefore, it is more likely that agricultural management is a field where deep learning is not typically utilized.
