@@ -146,7 +146,7 @@ async def generate_quiz(request: QuizRequest):
     global order
     global language
     global current_index
-    
+
     logger.info(f"generate_quiz initial type_ : {type_}")
     logger.info(f"generate_quiz initial session_no : {session_no}")
     logger.info(f"generate_quiz initial user_id : {user_id}")
@@ -170,6 +170,7 @@ async def generate_quiz(request: QuizRequest):
 @app.post("/check_answer")
 async def check_answer(request: AnswerRequest):
 
+    global session_no
     # quiz = read_quiz_from_file(RAG_OUTPUT, "quiz", user_id, session_no, type_, order)
     # logger.info(f"QUIZ : {quiz}")
     try:
