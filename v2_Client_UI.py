@@ -107,6 +107,8 @@ if 'language' not in st.session_state:
     st.session_state.language = "KO"
 if 'chat_log' not in st.session_state:
     st.session_state.chat_log = ""
+if 'chat_session_to_str' not in st.session_state:
+    st.session_state.chat_session_to_str = ""
 if 'quiz_status_check' not in st.session_state:
     st.session_state.quiz_status_check = 0
 
@@ -245,7 +247,7 @@ st.markdown(
 st.markdown('<p class="custom-title">복습퀴즈 챗봇 ✨팔딱이✨</p>', unsafe_allow_html=True)
 
 
-# txt 파일 ---> chat_session 형식으로 변환
+# 채팅기록 txt 파일 ---> chat_session 형식으로 변환
 def parse_txt_to_chat(content):
     chat_session = []
     lines = content.splitlines()  # 텍스트를 줄 단위로 분리
@@ -279,6 +281,19 @@ def parse_txt_to_chat(content):
         chat_session.append({"role": current_role, "content": "\n".join(current_content).strip()})
 
     return chat_session
+
+# chat_session ---> 채팅기록 txt 파일 형식으로 변환
+def parse_chat_session_to_txt(chat_session):
+    
+    result = []
+    for chat in chat_session:
+        # role과 content를 각각 추가
+        result.append(chat["role"])  # 🤖 또는 👤
+        result.append(chat["content"])  # 대화 내용
+        result.append("")  # 줄 간격 추가
+    
+    # 모든 항목을 줄바꿈으로 연결하고 마지막 공백 제거
+    return "\n".join(result).strip()
 
 # 최근 대화목록 생성/갱신
 def update_recent_chats():
@@ -564,10 +579,11 @@ def chat_page():
                     except openai.OpenAIError as e:
                         st.error(f"GPT 응답 생성 중 오류가 발생했습니다: {e}")
             
-
+    
+    if st.button("채팅기록 보기"):
+        st.text_area("채팅 내역", value=parse_chat_session_to_txt(st.session_state.chat_session), height=300)
     if st.button('QUIZ 시작'):
         generate_quiz()
-
     # 대화 내역을 선택할 수 있는 버튼 추가
     # def get_button_label(chat_df, chat_id):
     #     # 가장 마지막 사용자 메시지를 가져옵니다.
