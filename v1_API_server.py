@@ -139,6 +139,14 @@ async def set_type(request: SetSmallTopic):
 # 퀴즈 생성 엔드포인트
 @app.post("/generate_quiz")
 async def generate_quiz(request: QuizRequest):
+
+    global user_id
+    global session_no
+    global type_
+    global order
+    global language
+    global current_index
+    
     logger.info(f"generate_quiz initial type_ : {type_}")
     logger.info(f"generate_quiz initial session_no : {session_no}")
     logger.info(f"generate_quiz initial user_id : {user_id}")
