@@ -165,7 +165,7 @@ palddakpalddak/
       - get_button_label 함수에서 발생한 IndexError를 해결하기 위해서 예외 처리를 추가하여 코드의 안정성을 개선했습니다.
       - "User" 메시지가 없을 때 발생할 수 있는 오류를 방지하고, 메시지를 통해 사용자에게 피드백을 제공하게 했습니다.
       [문제 정의]
-      - get_button_label 함수 수정 중 IndexError가 발생했습니다. User 메시지가 없을 때 발생하는 오류였습니다.
+      - get_button_label 함수 수정 중 IndexError가 발생했습니다.
       [가설]
       - 데이터에서 "User" 메시지를 탐색할 때, 대소문자가 다르거나 메시지가 없는 경우가 원인일 수 있었습니다.
       [해결 방안]
