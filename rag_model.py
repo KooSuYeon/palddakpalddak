@@ -178,7 +178,7 @@ def choose_txt_list(type_:str):
     elif type_ == "python":
         return save_docs_list("PYTHON", 15, txt_list)
     elif type_ == "open_source":
-        return save_docs_list("OPENSOURCE", 7, txt_list)
+        return save_docs_list("OPENSOURCE", 6, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
     
 
@@ -327,10 +327,20 @@ def is_similar(new_quiz, quiz_list, threshold=0.8):
 
 
 # 세션 넘버가 바뀌어야 할 때 불러야 하는 함수
-def get_session_no(id: str) -> int:
+def get_session_no(id: str, file_path: str) -> int:
+    """
+    특정 디렉토리에서 id가 포함된 모든 txt 파일 검색 후 가장 큰 session_no 반환.
 
-    # 현재 디렉토리에서 id가 포함된 모든 txt 파일 검색
-    txt_files = [f for f in os.listdir('.') if f.startswith(id) and f.endswith('.txt')]
+    :param id: 검색할 파일 이름의 ID 부분
+    :param file_path: 검색할 디렉토리 경로
+    :return: 가장 큰 session_no, 없으면 0
+    """
+    # file_path에 포함된 모든 txt 파일 검색
+    try:
+        txt_files = [f for f in os.listdir(file_path) if f.startswith(id) and f.endswith('.txt')]
+    except FileNotFoundError:
+        print(f"Error: 디렉토리 {file_path}를 찾을 수 없습니다.")
+        return 0
 
     # session_no를 저장할 리스트
     session_numbers = []
@@ -345,7 +355,6 @@ def get_session_no(id: str) -> int:
         except ValueError:
             # session_no가 숫자가 아닌 경우 무시
             continue
-
     # session_no 리스트가 비어 있다면 0 반환, 그렇지 않으면 최대값 반환
     return max(session_numbers) if session_numbers else 0
 
@@ -467,18 +476,10 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
     else:
         rag_chain = create_concept_rag_chain(retriever, get_llm(api_key))
 
-    query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,       
-        )
     
     response = rag_chain.invoke("퀴즈 하나를 생성해줘")
 
     for _ in range(10):  # 유사하지 않은 퀴즈가 생성될 때까지 반복
-        query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,
-        )
         response = rag_chain.invoke("퀴즈 하나를 생성해줘")
 
         # 생성된 퀴즈가 유사하지 않다면 반복 종료
@@ -494,11 +495,12 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
 
     logger.info(f"번역 전 :  {question}")
     
-    translation = get_deepl_discription(question, language)
+    if language != "KO":
+        question = get_deepl_discription(question, language)
+
     # translation = get_translation(question, language).content
-    question = translation
     logger.info(f"번역 후 :  {question}")
-    if (id != ""):
+    if (id != "none"):
         save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
     return ''.join(question)
