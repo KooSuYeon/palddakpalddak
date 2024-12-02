@@ -14,7 +14,18 @@ from typing import List
 from dotenv import load_dotenv
 import os
 import re
+import logging
+import deepl
 
+############ 로그 파일 생성 ######################
+logging.basicConfig(
+    filename="RAG_MODEL.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logging.info("API Server started.")
+logger = logging.getLogger(__name__)
+##################################################
 
 def get_llm(api_key:str):
 
@@ -208,6 +219,7 @@ open_source_prompt = ChatPromptTemplate.from_messages([
     
     반드시 질문은 질문 내용으로 명확히 답할 수 있는 질문이어야 합니다. 
     질문을 만들 때에는 코드와 관련된 특정 동작이나 목적에 대해 물어야 하며, 질문 안에 반드시 **코드를 포함**해야 합니다.
+    되도록이면 코드의 시나리오적 질문을 생성해주세요.
     에시 코드는 질문에 포함하지마세요.
     
     예시:
@@ -257,7 +269,7 @@ open_source_prompt = ChatPromptTemplate.from_messages([
 
 discription_prompt = ChatPromptTemplate.from_messages([
     ("system", f"""
-    quiz에 대해 정답을 찾을 수 있는 부분을 context에서만 찾아서 한국말로 보여주세요.
+    quiz에 대해 정답을 찾을 수 있는 부분을 context에서 찾아서 한국말로 보여주세요.
     되도록이면 context 중에서도 코드 부분을 보여주세요.
     단, quiz와는 내용이 정확하게 일치하는 부분은 제외해주세요.
     찾을 수 없다면 아무것도 출력하지 마세요.
@@ -270,14 +282,14 @@ discription_prompt = ChatPromptTemplate.from_messages([
     """)
 ])
 
-translation_prompt = ChatPromptTemplate.from_messages([
-    ("system", f"""
-    content를 language로 번역해서 보여주세요.
+# translation_prompt = ChatPromptTemplate.from_messages([
+#     ("system", f"""
+#     받아온 content를 변형하지 말고 그대로 language로 번역만 해서 보여주세요.
     
-    content: {{content}}
-    language:{{language}}
-    """)
-])
+#     content: {{content}}
+#     language:{{language}}
+#     """)
+# ])
 
 
 def create_open_source_rag_chain(retriever, llm):
@@ -472,15 +484,20 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
         # 생성된 퀴즈가 유사하지 않다면 반복 종료
         if len(quiz_list) == 0 or not is_similar(response, quiz_list, 0.7):
             break
-
+    
+    logger.info(f"RAW :  {response}")
     if (type_=="open_source"):
         discription = get_discription(response, type_, order)
-        question = ''.join([discription.content, str(response)])
+        question = ''.join([discription.content, "\n", str(response)])
     else:
         question = ''.join(response)
+
+    logger.info(f"번역 전 :  {question}")
     
-    translation = get_translation(question, language).content
+    translation = get_deepl_discription(question, language)
+    # translation = get_translation(question, language).content
     question = translation
+    logger.info(f"번역 후 :  {question}")
     if (id != ""):
         save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
@@ -516,7 +533,8 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     feedback_chain = feedback_prompt | get_llm(api_key)
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
 
-    feedback = get_translation(''.join(feedback.content), language).content
+    feedback = get_deepl_discription(feedback.content, language)
+    # feedback = get_translation(''.join(feedback.content), language).content
 
 
     if (id != ""):
@@ -553,15 +571,15 @@ def read_quiz_from_file(directory: str, category: str, id: str, session_no: int,
 
 
 
-def get_translation(content:str, language:str):
+# def get_translation(content:str, language:str):
     
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
+#     load_dotenv()
+#     api_key = os.getenv("OPENAI_API_KEY")
 
-    translation_chain = translation_prompt | get_llm(api_key)
-    translation = translation_chain.invoke({"content": content, "language": language})
+#     translation_chain = translation_prompt | get_llm(api_key)
+#     translation = translation_chain.invoke({"content": content, "language": language})
 
-    return translation
+#     return translation
 
 
 def get_discription(quiz, type_, order):
@@ -576,6 +594,14 @@ def get_discription(quiz, type_, order):
 
     return discription
         
+
+def get_deepl_discription(content:str, language:str):
+
+    load_dotenv()
+    auth_key = os.getenv("DEEPL_API_KEY")
+    translator = deepl.Translator(auth_key)
+    result = translator.translate_text(content, target_lang=language)
+    return result.text
 
 
 ########## 호스팅 연결 테스트용 함수 ##################

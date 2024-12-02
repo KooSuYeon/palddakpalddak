@@ -103,7 +103,7 @@ if 'type_' not in st.session_state:
 if 'order' not in st.session_state:
     st.session_state.order = 1
 if 'language' not in st.session_state:
-    st.session_state.language = "한국어"
+    st.session_state.language = "KO"
 if 'chat_log' not in st.session_state:
     st.session_state.chat_log = ""
 if 'quiz_status_check' not in st.session_state:
@@ -368,9 +368,9 @@ def chat_page():
         textbook = st.sidebar.selectbox('어떤 교재를 선택할까요?', options=list(mapping_data[theme].keys()), key="order_str", on_change=update_api_order())
 
     # 언어 선택
-    language_list = ["한국어", "영어", "일본어"]
-    selection = st.sidebar.segmented_control("언어", language_list, selection_mode="single", default="한국어", key="language", on_change=update_language)
-    # st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
+    language_list = ["KO", "EN-US", "JA"]
+    selection = st.sidebar.segmented_control("언어", language_list, selection_mode="single", default="KO", key="language", on_change=update_language)
+    st.sidebar.markdown(f"**{selection}**가 선택되었습니다.")
     
     # 녹음 기능
     audio_value = st.sidebar.audio_input("음성으로 대화해보세요.")
