@@ -264,7 +264,7 @@ def update_recent_chats():
         if st.sidebar.button(f"{st.session_state.user_id}님의 최근 대화 {i}"):
             st.text_area("채팅 내역", value=content, height=300)  
 
-# CSV 파일에 마지막 대화 갱신 (append)
+# CSV 파일에 마지막 대화 갱신 (실시간 저장)
 def append_newchat_to_CSV():
     chat_id = st.session_state.user_id
     new_rows = []
@@ -278,6 +278,11 @@ def append_newchat_to_CSV():
     new_data_df = pd.DataFrame(new_rows)
     st.session_state.chat_history_df = pd.concat([st.session_state.chat_history_df, new_data_df], ignore_index=True) # 기존 chat_history_df와 new_data_df를 합침
     st.session_state.chat_history_df.to_csv(CSV_FILE, index=False) # CSV 파일에 저장
+    
+    # 채팅 로그내역 구성
+    loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
+    loaded_chat_string = "\n\n".join(f"{row['Role']}\n{row['Content']}" for _, row in loaded_chat.iterrows())
+    st.session_state.chat_log = loaded_chat_string
 
 # AI 언어 번역
 def get_deepl_discription(content:str, language:str):
@@ -395,7 +400,7 @@ def chat_page():
             # 로그 코드
             # st.write(f'현재 selected_theme : {st.session_state.selected_theme}')
             # st.write(f'현재 user_id : {st.session_state.user_id}')
-            # st.write(f'현재 session_no : {st.session_state.session_no}')
+            st.write(f'현재 session_no : {st.session_state.session_no}')
             # st.write(f'현재 type_ : {st.session_state.type_}')
             # st.write(f'현재 order : {st.session_state.order}')
             # st.write(f'현재 order_str : {st.session_state.order_str}')
@@ -426,7 +431,6 @@ def chat_page():
             st.error(f"API 호출 실패: {e}")
 
     if prompt := st.chat_input("메시지를 입력하세요."):
-        
         # 유저의 답변
         with st.chat_message("user"):
             st.markdown(prompt)
@@ -449,7 +453,7 @@ def chat_page():
                     st.markdown("QUIZスタートボタンを押してクイズを開始してください。")
                     st.session_state.chat_session.append({"role": "🤖", "content": "QUIZスタートボタンを押してクイズを開始してください。"})
                     append_newchat_to_CSV()
-        
+
         elif st.session_state.quiz_status_check == 1:
             with st.chat_message("ai"):
                 if st.session_state.quiz_status_check == 1 and st.session_state.language == "KO":
@@ -510,7 +514,7 @@ def chat_page():
 
                     except openai.OpenAIError as e:
                         st.error(f"GPT 응답 생성 중 오류가 발생했습니다: {e}")
-        
+            
 
     if st.button('QUIZ 시작'):
         generate_quiz()
@@ -527,14 +531,10 @@ def chat_page():
 
     # 사이드바에 저장된 대화 기록을 표시
     if len(st.session_state.chat_history_df) > 0:
-        # 이미 버튼이 만들어져 있다면 대화 목록 표시
         for chat_id in st.session_state.chat_history_df["ChatID"].unique():
             # button_label = get_button_label(st.session_state.chat_history_df, chat_id)
             if st.sidebar.button(f"{st.session_state.user_id}님의 현재 대화"):
-                loaded_chat = st.session_state.chat_history_df[st.session_state.chat_history_df["ChatID"] == chat_id]
-                loaded_chat_string = "\n\n".join(f"{row['Role']}\n{row['Content']}" for _, row in loaded_chat.iterrows())
-                st.session_state.chat_log = loaded_chat_string
-                st.text_area("채팅 내역", value=loaded_chat_string, height=300)
+                st.text_area("채팅 내역", value=st.session_state.chat_log, height=300)
     else:
         st.sidebar.write("진행중인 대화가 없습니다.")
     
@@ -550,7 +550,7 @@ def chat_page():
             st.success("현재 대화가 서버에 저장되었습니다.")
         except requests.exceptions.RequestException as e:
             st.error(f"서버 요청 실패: {e}")
-        
+
         # 대화세션 관련 정보 초기화
         st.session_state.chat_history_df = pd.DataFrame(columns=["ChatID", "Role", "Content"])
         st.session_state.chat_log =""
