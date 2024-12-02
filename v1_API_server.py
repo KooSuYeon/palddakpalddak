@@ -38,8 +38,8 @@ global rag_output_path
 global language
 
 
-user_id: str = "None"
-session_no: int = get_session_no(user_id) + 1
+user_id: str = "none"
+session_no: int = 1
 type_: str = "python"
 order: int = 1
 current_index: int = 0
@@ -112,6 +112,8 @@ async def server_check():
 # user_id 변경요청 처리
 @app.post("/set_user_id")
 async def set_type(request: SetUserID):
+
+    global user_id
     user_id = request.requested_user_id  # 요청받은 type을 전역변수 type_에 저장 (str)
     logger.info(f"set_user_id -> {user_id}")
     return {"message": f"Server user_id has been set to: {user_id}"}
@@ -119,6 +121,8 @@ async def set_type(request: SetUserID):
 # 대주제(type_) 변경요청 처리
 @app.post("/set_big_topic")
 async def set_type(request: SetBigTopic):
+
+    global type_
     type_ = request.big_topic  # 요청받은 type을 전역변수 type_에 저장 (str)
     logger.info(f"set_big_topic -> type_ : {type_}")
     return {"message": f"Selected type has been set to: {type_}"}
@@ -126,6 +130,8 @@ async def set_type(request: SetBigTopic):
 # 소주제(order) 변경요청 처리
 @app.post("/set_small_topic")
 async def set_type(request: SetSmallTopic):
+
+    global order
     order = request.small_topic_order  # 요청받은 order값을 전역변수 order에 저장 (int)
     logger.info(f"set_small_topic -> order : {order}")
     return {"message": f"Selected type has been set to: {order}"}
@@ -207,6 +213,11 @@ async def get_history(user_id: str):
 # 대화 저장 API
 @app.post("/save_conversation")
 async def save_conversation(conversation: Conversation):
+
+    global session_no
+    # logging.info(f"당신의 세션넘버 (변경 전) : {session_no}")
+    session_no = get_session_no(conversation.requested_user_id, RAG_OUTPUT) + 1
+    # logging.info(f"당신의 세션넘버 (변경 후) : {session_no}")
     # 현재 시간을 밀리초 단위로 포함하여 파일 이름 설정
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")  # 예: 20241126_153045_123456
     file_name = f"{conversation.requested_user_id}_{timestamp}.txt"
