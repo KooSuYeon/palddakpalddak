@@ -244,6 +244,42 @@ st.markdown(
 )
 st.markdown('<p class="custom-title">복습퀴즈 챗봇 ✨팔딱이✨</p>', unsafe_allow_html=True)
 
+
+# txt 파일 ---> chat_session 형식으로 변환
+def parse_txt_to_chat(content):
+    chat_session = []
+    lines = content.splitlines()  # 텍스트를 줄 단위로 분리
+    current_role = None
+    current_content = []
+
+    for line in lines:
+        line = line.strip()  # 공백 제거
+
+        # 역할 구분
+        if line.startswith("👤"):
+            # 이전 역할 저장
+            if current_role:
+                chat_session.append({"role": current_role, "content": "\n".join(current_content).strip()})
+            # 새 역할 시작
+            current_role = "👤"
+            current_content = []
+        elif line.startswith("🤖"):
+            # 이전 역할 저장
+            if current_role:
+                chat_session.append({"role": current_role, "content": "\n".join(current_content).strip()})
+            # 새 역할 시작
+            current_role = "🤖"
+            current_content = []
+        else:
+            # 현재 역할의 content에 줄 추가
+            current_content.append(line)
+
+    # 마지막 역할 저장
+    if current_role:
+        chat_session.append({"role": current_role, "content": "\n".join(current_content).strip()})
+
+    return chat_session
+
 # 최근 대화목록 생성/갱신
 def update_recent_chats():
     # 파일 목록 가져오기
@@ -259,10 +295,17 @@ def update_recent_chats():
     for i, file in enumerate(recent_files, start=1):
         file_path = os.path.join(CHATLOG_CLIENT_DIR, file)
         with open(file_path, "r", encoding="utf-8") as f:
-            content = f.read()  # 파일 내용 읽
+            content = f.read()
         # 파일 내용 출력 버튼 추가
         if st.sidebar.button(f"{st.session_state.user_id}님의 최근 대화 {i}"):
-            st.text_area("채팅 내역", value=content, height=300)  
+            st.session_state.chat_session = parse_txt_to_chat(content)
+            st.session_state.quiz_status_check = 2
+            reload_chattingBox()
+            st.rerun()
+            # time.sleep(1)
+            # if len(st.session_state.chat_session) >= 10:
+            #     st.text_area("채팅 내역", value=content, height=300)
+            
 
 # CSV 파일에 마지막 대화 갱신 (실시간 저장)
 def append_newchat_to_CSV():
@@ -291,6 +334,12 @@ def get_deepl_discription(content:str, language:str):
     translator = deepl.Translator(auth_key)
     result = translator.translate_text(content, target_lang=language)
     return result.text
+
+# chat_session 기준으로 대화창 갱신
+def reload_chattingBox():
+    for msg in st.session_state.chat_session:
+        with st.chat_message("ai" if msg["role"] == "🤖" else "user"):
+            st.markdown(msg["content"])
 
 ################ 콜백 함수 선언 (API 서버에 요청) ######################
 # 서버에 저장된 user_id의 최근 대화를 클라이언트 폴더에 저장
@@ -331,9 +380,9 @@ def update_language():
 ######################################################################
 
 # 기존 채팅기록 표시
-for content in st.session_state.chat_session:
-    with st.chat_message("ai" if content["role"] == "🤖" else "user"):
-        st.markdown(content["content"])
+for msg in st.session_state.chat_session:
+    with st.chat_message("ai" if msg["role"] == "🤖" else "user"):
+        st.markdown(msg["content"])
 
 # 전체 채팅 화면
 def chat_page():
@@ -389,7 +438,7 @@ def chat_page():
     if audio_value:
         st.sidebar.audio(audio_value)
     
-    st.sidebar.header('현재 채팅기록 보기')
+    
     
     # 퀴즈 생성 함수
     def generate_quiz():
@@ -400,7 +449,7 @@ def chat_page():
             # 로그 코드
             # st.write(f'현재 selected_theme : {st.session_state.selected_theme}')
             # st.write(f'현재 user_id : {st.session_state.user_id}')
-            st.write(f'현재 session_no : {st.session_state.session_no}')
+            # st.write(f'현재 session_no : {st.session_state.session_no}')
             # st.write(f'현재 type_ : {st.session_state.type_}')
             # st.write(f'현재 order : {st.session_state.order}')
             # st.write(f'현재 order_str : {st.session_state.order_str}')
@@ -529,16 +578,7 @@ def chat_page():
     #     else:
     #         return f"{chat_id[0:7]} : No User message found"  # 메시지가 없으면 안내 문구 표시
 
-    # 사이드바에 저장된 대화 기록을 표시
-    if len(st.session_state.chat_history_df) > 0:
-        for chat_id in st.session_state.chat_history_df["ChatID"].unique():
-            # button_label = get_button_label(st.session_state.chat_history_df, chat_id)
-            if st.sidebar.button(f"{st.session_state.user_id}님의 현재 대화"):
-                st.text_area("채팅 내역", value=st.session_state.chat_log, height=300)
-    else:
-        st.sidebar.write("진행중인 대화가 없습니다.")
-    
-    # 새로운 대화 세션 시작 버튼 (이전 대화저장 기능 포함)
+    # 새 대화 시작 버튼 (이전 대화저장 기능 포함)
     if st.sidebar.button('새 대화 시작'):
         # 서버에 현재 대화기록 저장
         try:
@@ -558,12 +598,24 @@ def chat_page():
         st.session_state.quiz_status_check = 0
 
         get_recent_chats_fromServer() #서버에 저장된 대화기록 불러오기 + 클라 저장
-        # update_recent_chats() # 최근 대화목록 갱신 <-- 버튼 중복생성 이슈
         st.rerun() # 채팅창 동기화를 위해 화면 갱신
 
-    st.sidebar.header('최근 대화내역')
-
+    # 현재 대화내용 버튼
+    st.sidebar.header('현재 채팅내용 보기')
+    if len(st.session_state.chat_history_df) > 0:
+        for chat_id in st.session_state.chat_history_df["ChatID"].unique():
+            # button_label = get_button_label(st.session_state.chat_history_df, chat_id)
+            if st.sidebar.button(f"{st.session_state.user_id}님의 현재 대화"):
+                # st.text_area("채팅 내역", value=st.session_state.chat_log, height=300)
+                st.session_state.quiz_status_check = 2     
+                st.session_state.chat_session = parse_txt_to_chat(st.session_state.chat_log)
+                reload_chattingBox()
+                st.rerun()
+    else:
+        st.sidebar.write("진행중인 대화가 없습니다.")
+    
     # 사이드바에 저장된 대화 기록을 표시
+    st.sidebar.header('최근 대화내역')
     if os.path.exists(CHATLOG_CLIENT_DIR):
     # 디렉토리 내 파일이나 폴더가 있는지 확인
         if os.listdir(CHATLOG_CLIENT_DIR):
