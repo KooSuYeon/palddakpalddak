@@ -371,7 +371,7 @@ def chat_page():
 
     # 언어 선택
     language_list = ["KO", "EN-US", "JA"]
-    selection = st.sidebar.segmented_control("대화언어 선택", language_list, selection_mode="single", default="KO", key="language", on_change=update_language)
+    st.sidebar.segmented_control("대화언어 선택", language_list, selection_mode="single", default="KO", key="language", on_change=update_language)
     if st.session_state.language == "KO" :
         st.sidebar.markdown(f"**한국어**가 선택되었습니다.")
     elif st.session_state.language == "EN-US" :
