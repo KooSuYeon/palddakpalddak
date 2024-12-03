@@ -100,7 +100,7 @@ def wait_for_api():
     
 wait_for_api()
 
-########### session_state 전역변수 초기값 및 각종 변수 선언 ####################
+# session_state 변수 선언
 if 'page' not in st.session_state:
     st.session_state.page = 'login'  # 초기 페이지 설정
 if "selected_theme" not in st.session_state:
@@ -127,18 +127,12 @@ if "audio_entered" not in st.session_state:
     st.session_state.audio_entered = False
 if "audio_text" not in st.session_state:
     st.session_state.audio_text = ""
-### 수진님 코드 (CSV 저장 관련) #######
+
 if "chat_session" not in st.session_state:
     st.session_state["chat_session"] = []
-    st.session_state["current_chat_id"] = st.session_state.user_id # str(uuid.uuid4())[:8] 임시 아이디
+    st.session_state["current_chat_id"] = st.session_state.user_id
 if 'theme_selected' not in st.session_state:
     st.session_state['theme_selected'] = False
-
-# chat_session 예시 형태 (딕셔너리로 구성된 리스트)
-# st.session_state.chat_session = [
-#     {"role": "assistant", "content": "Hello, how can I help you?"},
-#     {"role": "user", "content": "What is the weather today?"}
-# ]
 
 # 초기화 함수 (세션 상태에 chat_history_df 추가)
 def initialize_chat_history():
@@ -494,10 +488,6 @@ def update_recent_chats():
             st.session_state.quiz_status_check = 2
             reload_chattingBox()
             st.rerun()
-            # time.sleep(1)
-            # if len(st.session_state.chat_session) >= 10:
-            #     st.text_area("채팅 내역", value=content, height=300)
-            
 
 # CSV 파일에 마지막 대화 갱신 (실시간 저장)
 def append_newchat_to_CSV():
@@ -644,21 +634,8 @@ def chat_page():
 
     # 퀴즈 생성 함수
     def generate_quiz():
-        # with st.chat_message("ai"):
-        #     st.markdown("(팔딱이가 퀴즈를 작성중입니다...)")
         st.session_state.quiz_status_check = 1
         try:
-            # 로그 코드
-            # st.write(f'현재 selected_theme : {st.session_state.selected_theme}')
-            # st.write(f'현재 user_id : {st.session_state.user_id}')
-            # st.write(f'현재 session_no : {st.session_state.session_no}')
-            # st.write(f'현재 type_ : {st.session_state.type_}')
-            # st.write(f'현재 order : {st.session_state.order}')
-            # st.write(f'현재 order_str : {st.session_state.order_str}')
-            # st.write(f'현재 language : {st.session_state.language}')
-            # st.write(f'현재 chat_session : {st.session_state.chat_session}')
-            # st.write(f'현재 chat_history_df : {st.session_state.chat_history_df}')
-            # st.write(f'현재 chat_log : {st.session_state.chat_log}')
             
             response = requests.post(f"{API_BASE_URL}/generate_quiz", json={"topic": st.session_state.type_})
             response.raise_for_status()  # HTTP 에러 발생 시 예외를 발생시킴
@@ -705,17 +682,8 @@ def chat_page():
         st.text_area("채팅 내역", value=parse_chat_session_to_txt(st.session_state.chat_session), height=300)
     if st.button('QUIZ 시작'):
         generate_quiz()
-    # 대화 내역을 선택할 수 있는 버튼 추가
-    # def get_button_label(chat_df, chat_id):
-    #     # 가장 마지막 사용자 메시지를 가져옵니다.
-    #     user_messages = chat_df[(chat_df["ChatID"] == chat_id) & (chat_df["Role"] == "user")]
-    #     if not user_messages.empty:  # 'User' 메시지가 존재하는 경우
-    #         last_user_message = user_messages.iloc[-1]["Content"]
-    #         return f"{chat_id[0:7]} : {' '.join(last_user_message.split()[:10])}"  # 마지막 메시지의 첫 10단어를 표시
-    #     else:
-    #         return f"{chat_id[0:7]} : No User message found"  # 메시지가 없으면 안내 문구 표시
 
-    # 새 대화 시작 버튼 (이전 대화저장 기능 포함)
+    # 새 대화 시작
     if st.sidebar.button('새 대화 시작'):
         # 서버에 현재 대화기록 저장
         try:
@@ -741,9 +709,7 @@ def chat_page():
     st.sidebar.header('현재 채팅내용 보기')
     if len(st.session_state.chat_history_df) > 0:
         for chat_id in st.session_state.chat_history_df["ChatID"].unique():
-            # button_label = get_button_label(st.session_state.chat_history_df, chat_id)
             if st.sidebar.button(f"{st.session_state.user_id}님의 현재 대화"):
-                # st.text_area("채팅 내역", value=st.session_state.chat_log, height=300)
                 st.session_state.quiz_status_check = 2     
                 st.session_state.chat_session = parse_txt_to_chat(st.session_state.chat_log)
                 reload_chattingBox()
@@ -795,16 +761,13 @@ def login_page():
             update_api_user_id() # 유저 아이디 서버 전송
             get_recent_chats_fromServer() # 서버로부터 대화내역 로드 + 클라 저장
 
-            # st.success(f"안녕하세요! {st.session_state['user_id']}님 반갑습니다! '로그인' 버튼을 한번 더 누르면 채팅이 시작됩니다.")
             st.session_state.page = 'chat'  # 페이지를 'chat'으로 설정
             st.rerun() # 로그인 동기화를 위해 화면 갱신
         else:
             st.error('채팅에 사용할 ID를 먼저 입력해주세요.')
 
-# 앱 실행
+# page 상태에 따라 화면 전환
 if st.session_state.page == 'login':
     login_page()
 elif st.session_state.page == 'chat':
     chat_page()
-# elif st.session_state.page == 'chatting':
-#     user_chatting()
