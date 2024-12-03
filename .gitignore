@@ -1,6 +1,8 @@
 .env
 __pycache__/
 dataset
+.DS_Store
+
 
 venv
 API_server.log
