@@ -1,7 +1,12 @@
 .env
-__pycache__
+__pycache__/
+dataset
+.DS_Store
+
 
 venv
 API_server.log
 Client_UI.log
+RAG_MODEL.log
+rag_model_output/
 api.http

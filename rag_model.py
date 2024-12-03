@@ -282,15 +282,6 @@ discription_prompt = ChatPromptTemplate.from_messages([
     """)
 ])
 
-# translation_prompt = ChatPromptTemplate.from_messages([
-#     ("system", f"""
-#     받아온 content를 변형하지 말고 그대로 language로 번역만 해서 보여주세요.
-    
-#     content: {{content}}
-#     language:{{language}}
-#     """)
-# ])
-
 
 def create_open_source_rag_chain(retriever, llm):
     return (
@@ -533,11 +524,11 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
         ])
 
     feedback_chain = feedback_prompt | get_llm(api_key)
-    feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
+    feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer}).content
 
-    feedback = get_deepl_discription(feedback.content, language)
-    # feedback = get_translation(''.join(feedback.content), language).content
 
+    if language != "KO":
+        feedback = get_deepl_discription(feedback, language)
 
     if (id != ""):
         save_file(''.join(user_answer), f"{id}_{session_no}_{type_}_{order}_user_{user_file_number}.txt", rag_output_path)
@@ -570,18 +561,6 @@ def read_quiz_from_file(directory: str, category: str, id: str, session_no: int,
         return quiz_content
     else:
         raise FileNotFoundError(f"{file_path} 파일을 찾을 수 없습니다.")
-
-
-
-# def get_translation(content:str, language:str):
-    
-#     load_dotenv()
-#     api_key = os.getenv("OPENAI_API_KEY")
-
-#     translation_chain = translation_prompt | get_llm(api_key)
-#     translation = translation_chain.invoke({"content": content, "language": language})
-
-#     return translation
 
 
 def get_discription(quiz, type_, order):
