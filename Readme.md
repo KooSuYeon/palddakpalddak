@@ -3,52 +3,63 @@
 ## 📖 목차
 1. [How To Use](#-how-to-use)
 2. [Directory Structure](#-directory-structure)
-3. [Timeline](#-timeline)
-4. [팀 소개 및 협업 도구](#-팀-소개-및-협업-도구)
-5. [프로젝트 소개](#-프로젝트-소개)
-6. [프로젝트 계기](#-프로젝트-계기)
-7. [프로젝트 핵심 목표](#-프로젝트-핵심-목표)
-8. [Key Summary](#️-key-summary)
-9. [인프라 아키텍처 & 적용 기술](#-인프라-아키텍처-적용-기술)
-10. [주요기능](#-주요기능)
-11. [서비스 구조](#-서비스-구조)
-12. [기술적 고도화](#-기술적-고도화)
+3. [팀 소개 및 협업 도구](#-팀-소개-및-협업-도구)
+4. [프로젝트 소개](#-프로젝트-소개)
+5. [프로젝트 계기](#-프로젝트-계기)
+6. [프로젝트 핵심 목표](#-프로젝트-핵심-목표)
+7. [Key Summary](#️-key-summary)
+8. [인프라 아키텍처 & 적용 기술](#-인프라-아키텍처-적용-기술)
+9. [주요기능](#-주요기능)
+10. [서비스 구조](#-서비스-구조)
+11. [기술적 고도화](#-기술적-고도화)
+12. [Timeline](#-timeline)
+
 ---
 ## 📣 How To Use
 ```
-- 사전에 공유된 구글 드라이브 링크에서 dataset 디렉터리를 다운로드 받아준 후 루트 디렉터리에 해당 디렉터리를 위치시켜 줍니다.
-- .env 파일 생성 후  OPENAI_API_KEY, DEEPL_API_KEY, ELEVENLABS_API_KEY 환경 설정을 해줍니다.
-- pip install -r requirements.txt 를 통해 개발 할 때 사용한 라이브러리와 버전을 맞춰줍니다.
-- 터미널을 열어줍니다.
-- 터미널에 프론트엔드 파일을 실행시켜줍니다.   
-  streamlit run v2_Client_UI.py
+1. 원격 저장소에 올라와 있는 코드 clone 받기
+git clone https://github.com/KooSuYeon/palddakpalddak.git
+
+2. 라이브러리 사용을 위한 Conda 환경 생성
+(사전에 Anaconda가 설치되어 있어야 합니다.)
+(conda 24.5.0)
+conda env create -f palddak.yaml
+
+3. 환경 활성화
+conda activate palddak
+
+4. 사전에 공유된 구글 드라이브 링크에서 dataset 디렉터리를 다운로드 받아준 후 루트 디렉터리에 해당 디렉터리를 위치시켜 줍니다.
+
+5. .env 설정
+OPENAI_API_KEY, DEEPL_API_KEY, ELEVENLABS_API_KEY 환경 설정을 해줍니다.
+
+6. 실행 
+streamlit run v2_Client_UI.py  
+  
 ```
 
 ---
 
 ## 🔍 Directory Structure
 
-- 버전 관리가 필요한 파일들은 디렉터리 생성 후 넣어두었습니다.
+- 동작을 위해 필요한 파일 : palddak_backend.py, palddak_frontend.py, rag_model.py, audio_model.py, dataset 디렉터리, palddak.yaml
 - be, fe, rag_model : 백엔드, 프론트엔드, rag모델 버전 관리 (이전 버전)
-- log: 백엔드 로그 관리
-- rag_model_output : 사용자 채팅 관리
+- rag_model_output, user_chatlog_client, user_chatlog_server : 사용자 채팅 관리
 
 ```
 palddakpalddak/
-├── __pycache__/
-├── be/
+├── be/ # 과거 백엔드 버전
 │   ├── get_history_app.py
 │   ├── get_specific_input.py
-│   └── v0_API_server.py
-├── fe/
+│   └── v0_be.py
+├── dataset/ # 교재가 들어있는 디렉터리 (반드시 존재해야합니다!!!)
+├── fe/ # 과거 프론트엔드 버전
 │   ├── v1_fe.py
 │   └── v2_fe.py
-├── log/
-│   └── UI.log
-├── preProcessing/
-│   ├── preProcessing.py # 실제 교재 전처리 코드
-│   └── preProcessing_open_source # 실제 open_source 전처리 코드
-├── rag_model/
+├── pre_processing/ # 데이터셋 전처리 디렉터리
+│   ├── pre_processing.py # 실제 교재 전처리 코드
+│   └── pre_processing_opensource # 실제 open_source 전처리 코드
+├── rag_model/ # 과거 rag_model 버전
 │   ├── naive_rag_model.py
 │   ├── v0_rag_chatbot.ipynb
 │   ├── v1_rag_chatbot.ipynb
@@ -60,35 +71,26 @@ palddakpalddak/
     {user_id}_{session_no}_{type_}_{order}_quiz.txt
     {user_id}_{session_no}_{type_}_{order}_user.txt
     {user_id}_{session_no}_{type_}_{order}_feedback.txt
+├── user_chatlog_client/ # client 단 저장하는 채팅로그
+├── user_chatlog_server/ # server 단 저장하는 채팅로그
 ├── .gitignore
-├── rag_model.py # API_server.py 와 연결된 RAG 모델
+├── audio_model.py # 음성 출력 모델
+├── rag_model.py # 학습용 챗봇 모델
 ├── Readme.md
 ├── requirements.txt
-├── st_ui_HSgoon.py
-├── v1_API_server.py # 실제 BE
-└── v1_Client_UI.py
-└── v2_Client_UI.py # 실제 FE
+├── palddak_backend.py # 실제 BE
+└── palddak_frontend.py # 실제 FE
+└── palddak.yaml # 환경 활성화 파일
 
 ```
 
----
-## 🎢 Timeline
-- [x] 11/21 챗봇 종류 정하기 및 데이터셋 범위 설정
-- [x] 11/22 데이터셋 준비 & 전처리 완료
-- [x] 11/27 대화 내용 저장 & RAG 1차 고도화 완료
-- [x] 11/27 프론트엔드 채팅 화면 구현 완료
-- [x] 11/27 백엔드 질문 전송, 답변 전송 구현 완료
-- [x] 11/28 대화 내용을 구체적인 이름을 가진 txt 파일 저장으로 수정 완료 & RAG 2차 고도화 완료
-- [x] 11/28 프론트엔드 옵션 선택 사이드 바 구현 완료 & 변경된 input값 적용 완료
-- [x] 11/28 대화 저장 API 생성 완료 & 백엔드 수정된 input 값 적용 완료
-- [x] 11/29 프론트엔드 user_id 로그인 화면 구현
-- [x] 11/29 프론트엔드 세션 버튼 생성
-- [x] 11/29 백엔드 세션 저장 API 연결
-- [x] 11/29 RAG 모델에 이전 대화 내용 기억하는 기능 추가하기
+
+
 
 ---
 ## 🦾 팀 소개 및 협업 도구
 - 팀명 : 팔딱팔딱
+
 | 이름   | 역할                            |
 |--------|---------------------------------|
 | 구수연 | 팀장, AI 모델 개발, 데이터 수집, 대화세션 관리, 모델 성능개선 |
@@ -96,6 +98,7 @@ palddakpalddak/
 | 윤수진 | Streamlit UI, 데이터 수집, 대화세션 관리 |
 | 이현승 | Streamlit UI, 데이터 수집       |
 | 김윤소 | AI 모델 개발, API, 데이터 수집  |
+
 - 협업도구
    - GitHub
    - Jira
@@ -121,19 +124,135 @@ palddakpalddak/
 
 ---
 ## 🗝️ Key Summary
-- 챗봇 성능 고도화
-   - RAG(Retrieval-Augmented Generation) 모델을 기반으로 사용자가 원하는 교재에 맞춘 질문 생성을 가능하게 하여 학습 효율성을 향상시켰습니다.
+- 학습용 RAG 기반 질문, 피드백 생성 챗봇
+   - RAG(Retrieval-Augmented Generation) 모델을 기반으로 사용자가 원하는 교재에 맞춤화된 질문을 생성한 후 사용자의 학습을 이끌어낸 챗봇입니다.
+   - 질문에 대한 답을 하면 추가적인 피드백, 추가 질문을 가능하게 해 추가 학습도 돕습니다.
    - 기존에 특정 질문에만 연관된 결과가 반환되던 문제를 해결해 정확하고 연관성 높은 답변을 제공합니다.
 - 주요 트러블 슈팅 사례
-   - 챗봇이 유사한 질문을 계속 반복하는 경우
-   - 데이터 전처리 과정에서 너무 많은 텍스트가 삭제되는 경우
+   <details>
+  <summary>동적 크롤링에서 토글 형식으로 숨겨진 웹페이지 content를 갖고 오지 못하는 이슈</summary>
+
+   원인 : </br>주요 콘텐츠가 담기기까지 기다리고 토글 형식의 요소는 명시적으로 누르는 코드를 추가했어야 했습니다.
+
+   해결 코드 :
+   ```
+   driver.get(url)  # 페이지 로드
+
+         # 페이지 로드 대기
+      try:
+         WebDriverWait(driver, 10).until(
+               EC.presence_of_element_located((By.CSS_SELECTOR, '.notion-page-content'))
+         )
+         print("페이지가 완전히 로드되었습니다.")
+      except Exception as e:
+         print(f"페이지 로딩 실패: {url}. Error: {e}")
+         continue
+   ```
+   ```
+   # 토글이 닫혀 있으면 토글을 열기
+      try:
+         # 모든 토글 버튼을 찾음 (Ctrl+Alt+T에 해당하는 토글을 찾아서 열기)
+         toggle_buttons = driver.find_elements(By.XPATH, "//div[@role='button' and (@aria-expanded='false')]")
+
+         # 각 토글을 클릭하여 열기
+         for button in toggle_buttons:
+               button.click()
+               time.sleep(1)  # 토글이 열리기 전에 잠깐 대기
+   ```
+
+  </details>
+
+   <details>
+  <summary>데이터 전처리 과정에서 주요 텍스트가 삭제되는 경우</summary>
+
+   원인 : </br>교재에서 코드 부분이 있었기 때문에 특수 기호는 삭제하지 말았어야 했던 부분이었습니다.
+
+   해결 코드 :
+   ```
+   # 전처리 함수 정의
+   def preprocess_text(txt):
+      # 1. '[스파르타코딩클럽]' 제거
+      txt = re.sub(r'\[?스파르타코딩클럽\]?', '', txt)
+
+      # 2. 저작권 문구 제거
+      txt = re.sub(r'Copyright.*$', '', txt)
+
+      # 3. \xa0를 공백으로 변환
+      txt = txt.replace('\xa0', ' ')
+
+      # 4. 정규식을 사용해 \\로 시작하는 LaTeX 명령어 제거
+      txt = re.sub(r'\\[a-zA-Z]+\{.*?\}', '', txt)  
+
+      # 5. \command{...} 형식 제거
+      txt = re.sub(r'\\[a-zA-Z]+', '', txt)  
+
+      return txt
+   ```
+
+  </details>
+
+  <details>
+  <summary>챗봇이 유사한 질문을 계속 반복하는 이슈</summary>
+
+   원인 : </br>유사도 기반 retriever에서 계속해서 같은 문맥만을 갖고 왔기 때문이었습니다.
+
+   해결 코드 :
+   ```
+   def get_retriever(texts: str, current_index:int, api_key=str):
+
+      # text_list를 Document 객체로 변환
+      documents = [Document(page_content=texts)]
+
+      recursive_text_splitter = RecursiveCharacterTextSplitter(
+         chunk_size=200,
+         chunk_overlap=20,
+         length_function=len,
+         is_separator_regex=False,
+      )
+
+      splits_recur = recursive_text_splitter.split_documents(documents)
+      total_chunks = len(splits_recur)
+
+      current_index %= total_chunks
+      # 다음 인덱스 계산
+      next_index = current_index + 10
+      if next_index >= total_chunks:  # 초과 시 순환 처리
+         selected_splits = splits_recur[current_index:] + splits_recur[:next_index % total_chunks]
+      else:
+         selected_splits = splits_recur[current_index:next_index]
+
+      splits = selected_splits
+
+
+      # print("Top 10 chunks:")
+      # for i, chunk in enumerate(splits[:10], 1):
+      #     pprint(f"\nChunk {i}:\n{chunk.page_content}")
+
+      # OpenAI 임베딩 모델 초기화
+      embeddings = OpenAIEmbeddings(model="text-embedding-ada-002", api_key=api_key)
+      vectorstore = FAISS.from_documents(documents=splits, embedding=embeddings)
+      bm25_retriever = BM25Retriever.from_documents(splits)
+      faiss_retriever = vectorstore.as_retriever()
+
+      retriever = EnsembleRetriever(
+                  retrievers=[bm25_retriever, faiss_retriever],
+                  weights=[0.5, 0.5],  # 가중치 설정 (가중치의 합은 1.0)
+               )
+
+      return retriever 
+   ```
+
+  </details>
 
 ---
 ## 🏠 인프라 아키텍처 & 적용 기술
+
+![paldda_architecture](palddak_architecture.png)
+
 - 아키텍처 구조
    - Frontend: Streamlit을 사용하여 직관적이고 간단한 사용자 인터페이스(UI)를 제공합니다.
    - Backend: FastAPI와 Python 기반으로 데이터 처리 및 API 호출을 담당합니다.
-   - 데이터 관리: Chromadb를 활용해 문서 검색 및 질의응답에 최적화된 데이터베이스를 구축합니다.
+   - Retriever: FAISS + mb25 retriever (ensemble retriever) 를 활용해 문서 검색 및 질의응답에 최적화된 데이터베이스를 구축합니다.
 - 적용 기술 및 이유
    - LangChain: RAG 모델과의 유기적 통합을 통해 효율적인 질문-응답 생성을 구현합니다.
    - Selenium + BeautifulSoup: 웹 데이터를 수집 및 전처리하고, 강의 자료를 활용할 수 있습니다.
@@ -155,7 +274,9 @@ palddakpalddak/
 이러한 기능을 통해 학습자는 다양한 방식으로 학습 내용을 복습하며 더욱 효과적으로 학습할 수 있습니다.
 
 ---
+
 ## 🗂️ 서비스 구조
+![paldda_flow](palddak_flow.png)
 1. 전체 흐름
    - 사용자가 사이드바에서 주제를 선택하고 QUIZ 시작 버튼을 클릭합니다.
    - AI 백엔드에서 선택한 주제와 교재에 맞는 퀴즈를 생성해 클라이언트로 전달합니다.
@@ -175,7 +296,7 @@ palddakpalddak/
    -  사용자가 '머신러닝' 주제와 그와 관련된 교재를 선택한 후 `QUIZ 시작 버튼`을 통해 퀴즈를 요청 → AI가 QUIZ 생성 → 사용자가 답변 → AI가 피드백을 제공.
 
 ---
-## 🛫 기술적 고도화
+## 🛫 추가적인 기술적 고도화
 - 구수연
    <details>
    <summary>트러블 슈팅</summary>
@@ -246,3 +367,27 @@ palddakpalddak/
 
    </div>
    </details>
+
+---
+## 🎢 Timeline
+<details>
+  <summary>Timeline</summary>
+  
+  - [x] 11/21 챗봇 종류 정하기 및 데이터셋 범위 설정  
+  - [x] 11/22 데이터셋 준비 & 전처리 완료  
+  - [x] 11/27 대화 내용 저장 & RAG 1차 고도화 완료  
+  - [x] 11/27 프론트엔드 채팅 화면 구현 완료  
+  - [x] 11/27 백엔드 질문 전송, 답변 전송 구현 완료  
+  - [x] 11/28 대화 내용을 구체적인 이름을 가진 txt 파일 저장으로 수정 완료 & RAG 2차 고도화 완료  
+  - [x] 11/28 프론트엔드 옵션 선택 사이드 바 구현 완료 & 변경된 input값 적용 완료  
+  - [x] 11/28 대화 저장 API 생성 완료 & 백엔드 수정된 input 값 적용 완료  
+  - [x] 11/29 프론트엔드 user_id 로그인 화면 구현  
+  - [x] 11/29 프론트엔드 세션 버튼 생성  
+  - [x] 11/29 백엔드 세션 저장 API 연결  
+  - [x] 11/29 RAG 모델에 이전 대화 내용 기억하는 기능 추가하여 3차 고도화 완료
+  - [x] 12/01 retriever에 순회성을 부여하여 4차 고도화 완료
+  - [x] 12/01 백엔드 최근 대화 API, Text To Speech 구현
+  - [x] 12/02 프론트 엔드 녹음 기능 구현
+  - [x] 12/02 번역 API연결하여 RAG 5차 고도화 완료, 백엔드에도 번역 API 연결
+  - [x] 12/03 Speech To Text 구현 및 LLM 연결
+</details>

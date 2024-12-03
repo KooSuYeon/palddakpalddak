@@ -3,7 +3,6 @@ import streamlit as st
 from dotenv import load_dotenv
 import os
 import pandas as pd
-import uuid
 import requests  # FastAPI와 통신
 import logging
 import subprocess
@@ -15,7 +14,6 @@ from datetime import datetime
 
 from pydub import AudioSegment
 import speech_recognition as sr
-import librosa
 
 from elevenlabs import VoiceSettings
 from elevenlabs.client import ElevenLabs
@@ -64,7 +62,7 @@ logging.info("Streamlit UI started.")
 ################# FastAPI 서버 실행/종료 관련 모듈 개선 #######################
 # API 서버 실행
 def start_api_server():
-    process = subprocess.Popen(["uvicorn", "palddack_backend:app", "--reload", "--port", "8002"])
+    process = subprocess.Popen(["uvicorn", "palddak_backend:app", "--reload", "--port", "8002"])
     return process
 
 # API 서버 종료
