@@ -29,6 +29,7 @@ url_list=[]
 txt_list=[]
 
 # 환경변수에 저장된 URL 로드
+# URL의 수만큼 설정을 달리 해야함 (DL: 16, ML:23, LLM:18, PYTHON:15, OPENSOURCE:6)
 for i in range(1, 24):
     url = os.getenv(f"ML_URL_{i}")
     if url:  # 환경변수가 존재하면 추가
@@ -42,20 +43,14 @@ def preprocess_text(txt):
     # 2. 저작권 문구 제거
     txt = re.sub(r'Copyright.*$', '', txt)
 
-    # 3. 정규식을 사용해 \\로 시작하는 LaTeX 명령어 제거
-    txt = re.sub(r'\\[a-zA-Z]+', '', txt)
+    # 3. \xa0를 공백으로 변환
+    txt = txt.replace('\xa0', ' ')
 
-    # 4. 불필요한 공백 제거
-    txt = re.sub(r'\s+', ' ', txt).strip()
+    # 4. 정규식을 사용해 \\로 시작하는 LaTeX 명령어 제거
+    txt = re.sub(r'\\[a-zA-Z]+\{.*?\}', '', txt)  
 
-    # 5. 특수 문자 제거
-    txt = re.sub(r'[^\w\s]', '', txt)
-
-    # 6. 줄바꿈 제거
-    txt = re.sub(r'\n', '', txt)
-
-    # 7. '모든 토글을 열고 닫는 단축키 Windows : Ctrl + alt + t' 제거
-    txt = re.sub(r'모든 토글을 열고 닫는 단축키\s+Windows\s+Ctrl\s+alt\s+t\s+Mac\s+t', '', txt).strip()
+    # 5. \command{...} 형식 제거
+    txt = re.sub(r'\\[a-zA-Z]+', '', txt)  
 
     return txt
 
@@ -77,7 +72,7 @@ for url in url_list:
     # 토글이 닫혀 있으면 토글을 열기
     try:
         # 모든 토글 버튼을 찾음 (Ctrl+Alt+T에 해당하는 토글을 찾아서 열기)
-        toggle_buttons = driver.find_elements(By.XPATH, "//div[@role='button' and contains(@aria-label, '열기')]")
+        toggle_buttons = driver.find_elements(By.XPATH, "//div[@role='button' and (@aria-expanded='false')]")
 
         # 각 토글을 클릭하여 열기
         for button in toggle_buttons:
