@@ -14,7 +14,18 @@ from typing import List
 from dotenv import load_dotenv
 import os
 import re
+import logging
+import deepl
 
+############ 로그 파일 생성 ######################
+logging.basicConfig(
+    filename="RAG_MODEL.log",
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
+)
+logging.info("API Server started.")
+logger = logging.getLogger(__name__)
+##################################################
 
 def get_llm(api_key:str):
 
@@ -167,7 +178,7 @@ def choose_txt_list(type_:str):
     elif type_ == "python":
         return save_docs_list("PYTHON", 15, txt_list)
     elif type_ == "open_source":
-        return save_docs_list("OPENSOURCE", 7, txt_list)
+        return save_docs_list("OPENSOURCE", 6, txt_list)
     print(f"=========={type_}교재 불러오기 완료========")
     
 
@@ -208,6 +219,7 @@ open_source_prompt = ChatPromptTemplate.from_messages([
     
     반드시 질문은 질문 내용으로 명확히 답할 수 있는 질문이어야 합니다. 
     질문을 만들 때에는 코드와 관련된 특정 동작이나 목적에 대해 물어야 하며, 질문 안에 반드시 **코드를 포함**해야 합니다.
+    되도록이면 코드의 시나리오적 질문을 생성해주세요.
     에시 코드는 질문에 포함하지마세요.
     
     예시:
@@ -257,7 +269,7 @@ open_source_prompt = ChatPromptTemplate.from_messages([
 
 discription_prompt = ChatPromptTemplate.from_messages([
     ("system", f"""
-    quiz에 대해 정답을 찾을 수 있는 부분을 context에서만 찾아서 한국말로 보여주세요.
+    quiz에 대해 정답을 찾을 수 있는 부분을 context에서 찾아서 한국말로 보여주세요.
     되도록이면 context 중에서도 코드 부분을 보여주세요.
     단, quiz와는 내용이 정확하게 일치하는 부분은 제외해주세요.
     찾을 수 없다면 아무것도 출력하지 마세요.
@@ -270,14 +282,14 @@ discription_prompt = ChatPromptTemplate.from_messages([
     """)
 ])
 
-translation_prompt = ChatPromptTemplate.from_messages([
-    ("system", f"""
-    content를 language로 번역해서 보여주세요.
+# translation_prompt = ChatPromptTemplate.from_messages([
+#     ("system", f"""
+#     받아온 content를 변형하지 말고 그대로 language로 번역만 해서 보여주세요.
     
-    content: {{content}}
-    language:{{language}}
-    """)
-])
+#     content: {{content}}
+#     language:{{language}}
+#     """)
+# ])
 
 
 def create_open_source_rag_chain(retriever, llm):
@@ -315,10 +327,20 @@ def is_similar(new_quiz, quiz_list, threshold=0.8):
 
 
 # 세션 넘버가 바뀌어야 할 때 불러야 하는 함수
-def get_session_no(id: str) -> int:
+def get_session_no(id: str, file_path: str) -> int:
+    """
+    특정 디렉토리에서 id가 포함된 모든 txt 파일 검색 후 가장 큰 session_no 반환.
 
-    # 현재 디렉토리에서 id가 포함된 모든 txt 파일 검색
-    txt_files = [f for f in os.listdir('.') if f.startswith(id) and f.endswith('.txt')]
+    :param id: 검색할 파일 이름의 ID 부분
+    :param file_path: 검색할 디렉토리 경로
+    :return: 가장 큰 session_no, 없으면 0
+    """
+    # file_path에 포함된 모든 txt 파일 검색
+    try:
+        txt_files = [f for f in os.listdir(file_path) if f.startswith(id) and f.endswith('.txt')]
+    except FileNotFoundError:
+        print(f"Error: 디렉토리 {file_path}를 찾을 수 없습니다.")
+        return 0
 
     # session_no를 저장할 리스트
     session_numbers = []
@@ -333,7 +355,6 @@ def get_session_no(id: str) -> int:
         except ValueError:
             # session_no가 숫자가 아닌 경우 무시
             continue
-
     # session_no 리스트가 비어 있다면 0 반환, 그렇지 않으면 최대값 반환
     return max(session_numbers) if session_numbers else 0
 
@@ -455,33 +476,31 @@ def get_question_language(session_no:int, id:str, type_:str,  order:int, languag
     else:
         rag_chain = create_concept_rag_chain(retriever, get_llm(api_key))
 
-    query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,       
-        )
     
     response = rag_chain.invoke("퀴즈 하나를 생성해줘")
 
     for _ in range(10):  # 유사하지 않은 퀴즈가 생성될 때까지 반복
-        query = concept_prompt.format(
-            context=retriever,
-            quiz_list=quiz_list,
-        )
         response = rag_chain.invoke("퀴즈 하나를 생성해줘")
 
         # 생성된 퀴즈가 유사하지 않다면 반복 종료
         if len(quiz_list) == 0 or not is_similar(response, quiz_list, 0.7):
             break
-
+    
+    logger.info(f"RAW :  {response}")
     if (type_=="open_source"):
         discription = get_discription(response, type_, order)
-        question = ''.join([discription.content, str(response)])
+        question = ''.join([discription.content, "\n", str(response)])
     else:
         question = ''.join(response)
+
+    logger.info(f"번역 전 :  {question}")
     
-    translation = get_translation(question, language).content
-    question = translation
-    if (id != ""):
+    if language != "KO":
+        question = get_deepl_discription(question, language)
+
+    # translation = get_translation(question, language).content
+    logger.info(f"번역 후 :  {question}")
+    if (id != "none"):
         save_file(''.join(question), f"{id}_{session_no}_{type_}_{order}_quiz_{file_number}.txt", rag_output_path)
 
     return ''.join(question)
@@ -516,7 +535,8 @@ def get_feedback(session_no:str, id:str, type_:str, order:int, quiz:str, user_an
     feedback_chain = feedback_prompt | get_llm(api_key)
     feedback = feedback_chain.invoke({"quiz": quiz, "user_answer": user_answer})
 
-    feedback = get_translation(''.join(feedback.content), language).content
+    feedback = get_deepl_discription(feedback.content, language)
+    # feedback = get_translation(''.join(feedback.content), language).content
 
 
     if (id != ""):
@@ -553,15 +573,15 @@ def read_quiz_from_file(directory: str, category: str, id: str, session_no: int,
 
 
 
-def get_translation(content:str, language:str):
+# def get_translation(content:str, language:str):
     
-    load_dotenv()
-    api_key = os.getenv("OPENAI_API_KEY")
+#     load_dotenv()
+#     api_key = os.getenv("OPENAI_API_KEY")
 
-    translation_chain = translation_prompt | get_llm(api_key)
-    translation = translation_chain.invoke({"content": content, "language": language})
+#     translation_chain = translation_prompt | get_llm(api_key)
+#     translation = translation_chain.invoke({"content": content, "language": language})
 
-    return translation
+#     return translation
 
 
 def get_discription(quiz, type_, order):
@@ -576,6 +596,14 @@ def get_discription(quiz, type_, order):
 
     return discription
         
+
+def get_deepl_discription(content:str, language:str):
+
+    load_dotenv()
+    auth_key = os.getenv("DEEPL_API_KEY")
+    translator = deepl.Translator(auth_key)
+    result = translator.translate_text(content, target_lang=language)
+    return result.text
 
 
 ########## 호스팅 연결 테스트용 함수 ##################

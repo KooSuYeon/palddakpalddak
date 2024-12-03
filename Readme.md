@@ -134,6 +134,7 @@ palddakpalddak/
 
 ---
 ## 🗝️Key Summary
+<<<<<<< HEAD
 - 구수연
    <details>
    <summary>트러블 슈팅</summary>
@@ -155,6 +156,8 @@ palddakpalddak/
    </div>
    </details>
 
+=======
+>>>>>>> bd6532d8d7495c5ebff7e06f1eb399c41f75b692
 - 윤수진
    <details>
    <summary>핵심 성능 개선</summary>
