@@ -171,8 +171,7 @@ async def generate_quiz(request: QuizRequest):
 async def check_answer(request: AnswerRequest):
 
     global session_no
-    # quiz = read_quiz_from_file(RAG_OUTPUT, "quiz", user_id, session_no, type_, order)
-    # logger.info(f"QUIZ : {quiz}")
+
     try:
         logger.info(f"Checking answer for context {request.user_answer}")
         feedback = get_feedback(session_no, user_id, type_, order, request.quiz, request.user_answer, language, RAG_OUTPUT)

@@ -64,7 +64,7 @@ logging.info("Streamlit UI started.")
 ################# FastAPI 서버 실행/종료 관련 모듈 개선 #######################
 # API 서버 실행
 def start_api_server():
-    process = subprocess.Popen(["uvicorn", "v1_API_server:app", "--reload", "--port", "8002"])
+    process = subprocess.Popen(["uvicorn", "palddack_backend:app", "--reload", "--port", "8002"])
     return process
 
 # API 서버 종료
@@ -618,7 +618,7 @@ def chat_page():
     # 녹음 기능
     if audio_value := st.sidebar.audio_input("음성으로 대화해보세요."):
         # st.sidebar.audio(audio_value)
-        folder_name = "Client_audio"
+        folder_name = "user"
         os.makedirs(folder_name, exist_ok=True)
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
