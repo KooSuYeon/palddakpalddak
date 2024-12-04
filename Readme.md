@@ -21,9 +21,15 @@
 git clone https://github.com/KooSuYeon/palddakpalddak.git
 
 2. 라이브러리 사용을 위한 Conda 환경 생성
+- for Linux/macOS
 (사전에 Anaconda가 설치되어 있어야 합니다.)
 (conda 24.5.0)
 conda env create -f palddak.yaml
+
+- for Windows
+(사전에 Anaconda가 설치되어 있어야 합니다.)
+(conda 24.5.0)
+conda env create -f palddak_win.yaml
 
 3. 환경 활성화
 conda activate palddak
